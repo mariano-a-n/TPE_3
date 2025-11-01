@@ -1,0 +1,124 @@
+body {
+    padding: 0;
+}
+
+.header {
+    background-image: url("https://images.unsplash.com/photo-1515281239448-2abe329fe5e5?fm=jpg&q=60&w=3000&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8bXVjaG9zJTIwY2Fycm9zfGVufDB8fDB8fHww");
+    background-size: cover;
+}
+
+.title {
+    text-align: center;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-style: oblique;
+    color: aqua;
+    background-color: rgb(84, 81, 78);
+    border-radius: 50%;
+    opacity: 0.9;
+}
+
+#logo {
+    display: grid;
+    justify-content: center;
+    margin: 20px;
+}
+
+#logo img {
+    width: 150px;
+    border-radius: 50%;
+}
+
+h1 {
+    text-align: center;
+}
+
+.navBar ul {
+    display: flex;
+    justify-content: center;
+    text-align: center;
+    gap: 100px;
+    list-style-type: none;
+    background-color: aqua;
+    
+}
+
+.navBar a {
+    text-decoration: none;
+    font-size: x-large;
+    color: black;
+}
+
+.formLogin {
+    display: grid;
+    text-align: center;
+    margin: 50px;
+    width: 200px;
+}
+
+.formLogin h3 {
+    text-align: center;
+}
+
+.btn-primary {
+    margin-top: 7px;
+}
+
+.marcas,
+.form-modelos {
+    padding: 5px;
+}
+
+.form-modelos h2 {
+    text-align: center;
+}
+
+.modelos,
+.usados,
+.nuevos {
+    display: grid;
+    grid-template-columns: .5fr .5fr .5fr;
+    margin-top: 20px;
+}
+
+.modelos img,
+.usados img,
+.nuevos img {
+    width: 100%;
+}
+
+.modelos h4,
+.usados h4,
+.nuevos h4 {
+    text-align: center;
+}
+
+.modelos section,
+.usados section,
+.nuevos section {
+    margin: 20px;
+}
+
+.modelos section img,
+.usados section img,
+.nuevos section img {
+    background-color: rgb(246, 241, 241);
+    height: 250px;
+}
+
+.modelos h1 {
+    color: rgb(212, 17, 62);
+    font-weight: bold;
+    font-family: fantasy;
+}
+
+.detalles img {
+    display: grid;
+    margin: 0 auto;
+    width: 70%;
+}
+
+.detalles,
+.footer {
+    display: grid;
+    text-align: center;
+}
