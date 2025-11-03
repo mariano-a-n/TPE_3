@@ -35,10 +35,6 @@ require_once 'app/models/model.php';
         }
 
         function insertCar($id_marca, $modelo, $anio, $km, $precio, $patente, $es_nuevo, $imagen) {
-            // 1. Verificar si la marca ya existe
-            
-
-            // 2. Insertar vehículo
             $insertVehiculo = $this->db->prepare("INSERT INTO vehiculos(id_marca, modelo, anio, km, precio, patente, es_nuevo, imagen) VALUES (?,?,?,?,?,?,?,?)");
             $insertVehiculo->execute([$id_marca, $modelo, $anio, $km, $precio, $patente, $es_nuevo, $imagen]);
 
