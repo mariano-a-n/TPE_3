@@ -1,6 +1,6 @@
 <?php
     require_once 'app/models/model.php';
-    class taskModel extends Model{
+    class ModelMarcas extends Model{
         // Obtiene y devuelve la base de datos de las marcas
         function getCarBrands() {
 
