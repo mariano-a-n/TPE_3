@@ -8,8 +8,8 @@
         private $modelCar;
 
         function __construct(){
-            $this->model = new taskModel();
-            $this->modelCar = new taskModelV();
+            $this->model = new ModelMarcas();
+            $this->modelCar = new ModelVehiculos();
         }
 
 
@@ -34,6 +34,7 @@
             return $res->json($marca, 200);
         }
 
+        
         function removeBrand($req, $res) {
             $id = $req->params->id;
 

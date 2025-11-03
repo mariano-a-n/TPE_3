@@ -21,8 +21,8 @@ $router->addRoute('marcas/:id',      'PUT',      'MarcasControler',         '');
 $router->addRoute('vehiculos',      'GET',      'VehiculosControler',         'showHome');
 $router->addRoute('vehiculos/:id',      'GET',      'VehiculosControler',         'showCarBrandById');
 
-$router->addRoute('vehiculos/:id',      'DELETE',      'VehiculosControler',         'removeBrend');
-$router->addRoute('vehiculos',      'POST',      'VehiculosControler',         '');
+$router->addRoute('vehiculos/:id',      'DELETE',      'VehiculosControler',         '');
+$router->addRoute('vehiculos',      'POST',      'VehiculosControler',         'addCarVehiculo');
 $router->addRoute('vehiculos/:id',      'PUT',      'VehiculosControler',         '');
 
 

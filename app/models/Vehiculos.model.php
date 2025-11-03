@@ -1,8 +1,19 @@
 <?php
 require_once 'app/models/model.php';
-    class taskModelV extends Model{
+    class ModelVehiculos extends Model{
 
         function getCarModel() {
+            // 2. consulta SQL (SELECT * FROM vehiculos)
+            $query = $this->db->prepare('SELECT * FROM vehiculos');
+            $query->execute();
+
+            // obtengo todos los resultados de la consulta que arroja la query
+            $models = $query->fetchAll(PDO::FETCH_OBJ);
+
+            return $models;
+        }
+
+        function getCarById() {
             // 2. consulta SQL (SELECT * FROM vehiculos)
             $query = $this->db->prepare('SELECT * FROM vehiculos');
             $query->execute();
@@ -23,24 +34,15 @@ require_once 'app/models/model.php';
             $query->execute([$id]);
         }
 
-        function insertCar($modelo, $anio, $km, $precio, $patente, $es_nuevo, $imagen, $vendido, $marca, $nacionalidad, $anio_de_creacion) {
+        function insertCar($id_marca, $modelo, $anio, $km, $precio, $patente, $es_nuevo, $imagen) {
             // 1. Verificar si la marca ya existe
-            $query = $this->db->prepare("SELECT id FROM marcas WHERE marca = ?");
-            $query->execute([$marca]);
-            $resultadoMarca = $query->fetch(PDO::FETCH_ASSOC);
+            
 
-            if ($resultadoMarca) {
-                $id_marca = $resultadoMarca['id'];
-            } else {
-                // 2. Insertar nueva marca
-                $insertMarca = $this->db->prepare("INSERT INTO marcas(marca, nacionalidad, anio_de_creacion) VALUES (?,?,?)");
-                $insertMarca->execute([$marca, $nacionalidad, $anio_de_creacion]);
-                $id_marca = $this->db->lastInsertId();
-            }
+            // 2. Insertar vehículo
+            $insertVehiculo = $this->db->prepare("INSERT INTO vehiculos(id_marca, modelo, anio, km, precio, patente, es_nuevo, imagen) VALUES (?,?,?,?,?,?,?,?)");
+            $insertVehiculo->execute([$id_marca, $modelo, $anio, $km, $precio, $patente, $es_nuevo, $imagen]);
 
-            // 3. Insertar vehículo
-            $insertVehiculo = $this->db->prepare("INSERT INTO vehiculos(modelo, anio, km, precio, patente, es_nuevo, imagen, vendido, id_marca) VALUES (?,?,?,?,?,?,?,?,?)");
-            $insertVehiculo->execute([$modelo, $anio, $km, $precio, $patente, $es_nuevo, $imagen, $vendido, $id_marca]);
+            return $this->db->lastInsertId();
         }
 
 //////////////////// mariano-dev
