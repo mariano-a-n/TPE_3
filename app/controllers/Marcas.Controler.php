@@ -8,8 +8,8 @@
         private $modelCar;
 
         function __construct(){
-            $this->model = new taskModel();
-            $this->modelCar = new taskModelV();
+            $this->model = new ModelMarcas();
+            $this->modelCar = new ModelVehiculos();
         }
 
 
