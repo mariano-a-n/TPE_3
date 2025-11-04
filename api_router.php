@@ -23,7 +23,7 @@ $router->addRoute('vehiculos/:id',      'GET',      'VehiculosControler',       
 
 $router->addRoute('vehiculos/:id',      'DELETE',      'VehiculosControler',         '');
 $router->addRoute('vehiculos',      'POST',      'VehiculosControler',         'addCarVehiculo');
-$router->addRoute('vehiculos/:id',      'PUT',      'VehiculosControler',         '');
+$router->addRoute('vehiculos/:id',      'PUT',      'VehiculosControler',         'updateCar');
 
 
 
