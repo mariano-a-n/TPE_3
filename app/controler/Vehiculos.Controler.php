@@ -5,8 +5,10 @@
     class VehiculosControler {
         private $model;
         private $modelMarca;
+        private $params;
 
         function __construct(){
+            $this->params = (object) $_GET;
             $this->model = new ModelVehiculos();
             $this->modelMarca =  new ModelMarcas();
         }
@@ -22,12 +24,18 @@
 
                 $marca = (int)$req->query->marca;
 
+                if (isset($req->query->sort)) {
+                    $sort = $req->query->sort;
+                }
+
+                if (isset($req->query->order)) {
+                    $order = strtoupper($req->query->order);
+                }
+                    $modelos = $this->model->getVehiculosByMarca($marca);
+            } else {
                 $modelos = $this->model->getCarModel();
 
-            }else{
-                $modelos = $this->model->getCarModel();
 
-                
             }
             return $res->json($modelos);
         }
@@ -44,8 +52,89 @@
         }
 
         function showCarDetails($id) {
-            $modelos = $this->model->getCarModel();
+            $modelos = $this->model->getCarModel($id);
+
+        }
+
+        function orderCarByPrecio($req, $res) {
+            $order = $req->params->order ?? 'ASC'; // Puede ser 'ASC' o 'DESC'
+            $modelos = $this->model->getCarsOrderedByPrecio($order);
+
+            if (empty($modelos)) {
+                return $res->json("No se encontraron vehículos", 404);
+            }
+
+            return $res->json($modelos);
+        }
+
+        function refreshCar($req, $res) {
+            $id = $req->params->id;
+            $modelo = $this->model->getCarModel($id);
+
+            if (!$modelo) {
+                return $res->json("Vehículo con id=$id no encontrado", 404);
+            }
             
+            if (empty($req->body->id_marca) || !isset($req->body->id_marca)) {
+                return $res->json('Faltan datos', 400);
+            }
+            
+            if (empty($req->body->modelo) || !isset($req->body->modelo)) {
+                return $res->json('Faltan datos', 400);
+            }
+
+            if (empty($req->body->anio) || !isset($req->body->anio)) {
+                return $res->json('Faltan datos', 400);
+            }
+
+            if (empty($req->body->km) || !isset($req->body->km)) {
+                return $res->json('Faltan datos', 400);
+            }
+            
+            if (empty($req->body->precio) || !isset($req->body->precio)) {
+                return $res->json('Faltan datos', 400);
+            }
+
+            if (empty($req->body->patente) || !isset($req->body->patente)) {
+                return $res->json('Faltan datos', 400);
+            }
+
+            if (empty($req->body->imagen) || !isset($req->body->imagen)) {
+                return $res->json('Faltan datos', 400);
+            }
+
+            $id_marca = $req->body->id_marca;
+            $modelo = trim($req->body->modelo);
+            $anio = (int) $req->body->anio;
+            $km = (int) $req->body->km;
+            $precio = (float) $req->body->precio;
+
+            //strtoupper hece que todo el txt se vuelva en mayusculas
+            $patente = strtoupper(trim($req->body->patente));
+
+            $imagen = trim($req->body->imagen);
+
+            // Campos opcionales es nuevo por default en la tabla siempre es nuevo
+            if (isset($req->body->es_nuevo)) {
+                $es_nuevo = (int) $req->body->es_nuevo;
+            } else {
+                $es_nuevo = 0;
+            }
+
+            //comprovacion de logica  si es nuevo no puede tener mas de 0 km
+            if ($es_nuevo == 1 && $km > 0) {
+                return $res->json('error: Un vehículo nuevo no puede tener kilómetros.', 400);
+            }
+            //
+            if ($es_nuevo == 0 && $km <= 0) {
+                return $res->json('error: El vehiculo es usado pero tiene 0 km.', 400);
+            }
+
+            // actualizo el auto
+            $this->model->updateModelCar($id_marca, $modelo, $anio, $km, $precio, $patente, $es_nuevo, $imagen);
+            // obtengo auto modificado y devuelvo la respuesta
+            $modelo = $this->model->getCarById($id);
+            return $res->json("El vehículo id=$id actualizado con éxito", 200);
         }
 
         function usedCars($id) {
@@ -61,12 +150,12 @@
         // ==== ACCIONES ====
         function sellCar($id) {
             $this->model->updateCar($id);
-            header("Location: " . BASE_URL . "modelos");
+            // header("Location: " . BASE_URL . "modelos");
         }
 
         function eraseCar($id) {
             $this->model->deleteCar($id);
-            header("Location: " . BASE_URL . "modelos");
+            // header("Location: " . BASE_URL . "modelos");
         }
 
 
@@ -75,32 +164,31 @@
             //comprubo los datos
 
             if (empty($req->body->id_marca) || !isset($req->body->id_marca)) {
-            return $res->json('Faltan datos', 400);
+                return $res->json('Faltan datos', 400);
             }
             
             if (empty($req->body->modelo) || !isset($req->body->modelo)) {
-            return $res->json('Faltan datos', 400);
+                return $res->json('Faltan datos', 400);
             }
 
             if (empty($req->body->anio) || !isset($req->body->anio)) {
-            return $res->json('Faltan datos', 400);
+                return $res->json('Faltan datos', 400);
             }
 
             if (empty($req->body->km) || !isset($req->body->km)) {
-            return $res->json('Faltan datos', 400);
+                return $res->json('Faltan datos', 400);
             }
             
-            
             if (empty($req->body->precio) || !isset($req->body->precio)) {
-            return $res->json('Faltan datos', 400);
+                return $res->json('Faltan datos', 400);
             }
 
             if (empty($req->body->patente) || !isset($req->body->patente)) {
-            return $res->json('Faltan datos', 400);
+                return $res->json('Faltan datos', 400);
             }
 
             if (empty($req->body->imagen) || !isset($req->body->imangen)) {
-            return $res->json('Faltan datos', 400);
+                return $res->json('Faltan datos', 400);
             }
 
             $id_marca = (int) $req->body->id_marca;
