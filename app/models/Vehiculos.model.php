@@ -13,15 +13,13 @@ require_once 'app/models/model.php';
             return $models;
         }
 
-        function getCarById() {
+        function getCarById($id) {
             // 2. consulta SQL (SELECT * FROM vehiculos)
-            $query = $this->db->prepare('SELECT * FROM vehiculos');
-            $query->execute();
+            $query = $this->db->prepare('SELECT * FROM vehiculos WHERE id = ?');
+            $query->execute([$id]);
 
             // obtengo todos los resultados de la consulta que arroja la query
-            $models = $query->fetchAll(PDO::FETCH_OBJ);
-
-            return $models;
+            return $query->fetchAll(PDO::FETCH_OBJ);
         }
         
         function updateCar($id) {
@@ -35,11 +33,23 @@ require_once 'app/models/model.php';
         }
 
         function insertCar($id_marca, $modelo, $anio, $km, $precio, $patente, $es_nuevo, $imagen) {
-            $insertVehiculo = $this->db->prepare("INSERT INTO vehiculos(id_marca, modelo, anio, km, precio, patente, es_nuevo, imagen) VALUES (?,?,?,?,?,?,?,?)");
-            $insertVehiculo->execute([$id_marca, $modelo, $anio, $km, $precio, $patente, $es_nuevo, $imagen]);
+            $query = $this->db->prepare("INSERT INTO vehiculos(id_marca, modelo, anio, km, precio, patente, es_nuevo, imagen) VALUES (?,?,?,?,?,?,?,?)");
+            $query->execute([$id_marca, $modelo, $anio, $km, $precio, $patente, $es_nuevo, $imagen]);
 
             return $this->db->lastInsertId();
         }
+
+        function updateModelCar($id_marca, $modelo, $anio, $km, $precio, $patente, $es_nuevo, $imagen) {
+            $query = $this->db->prepare("UPDATE vehiculos SET id_marca=?, modelo=?, anio=?, km=?, precio=?, patente=?, es_nuevo=?, imagen=?, vendido=? WHERE id=?");
+            $query->execute($modelo, $anio, $km, $precio, $patente, $es_nuevo, $imagen, $id_marca);
+        }
+
+        function getCarsOrderedByPrecio($order) {
+            $query = $this->db->prepare("SELECT * FROM vehiculos ORDER BY precio $order");
+            $query->execute();
+            return $query->fetchAll(PDO::FETCH_OBJ);
+        }
+        
 
 //////////////////// mariano-dev
 
