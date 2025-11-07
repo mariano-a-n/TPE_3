@@ -57,7 +57,7 @@
         }
 
         function orderCarByPrecio($req, $res) {
-            $order = $req->params->order ?? 'ASC'; // Puede ser 'ASC' o 'DESC'
+            $order = $req->params->order ?? 'ASC';
             $modelos = $this->model->getCarsOrderedByPrecio($order);
 
             if (empty($modelos)) {
