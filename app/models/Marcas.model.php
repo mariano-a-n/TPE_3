@@ -65,15 +65,13 @@
 
 
         function getCarBrandByName($nombre) {
-
-
             //2. envio consulta
             $query = $this->db->prepare('SELECT * FROM marcas WHERE marca LIKE ?');
             $query->execute(["%$nombre%"]);
 
-            $carrera = $query->fetch(PDO::FETCH_OBJ);
+            
+            return $query->fetch(PDO::FETCH_OBJ);
 
-            return $carrera;
         }
     }
 

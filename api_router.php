@@ -4,6 +4,7 @@
 require_once 'libs/router/router.php';
 
 require_once 'app/controler/Marcas.Controler.php';
+require_once 'app/controler/Vehiculos.Controler.php';
 
 
 $router = new Router();
@@ -24,7 +25,6 @@ $router->addRoute('vehiculos/:id',      'GET',      'VehiculosControler',       
 $router->addRoute('vehiculos/:id',      'DELETE',      'VehiculosControler',         '');
 $router->addRoute('vehiculos',      'POST',      'VehiculosControler',         'addCarVehiculo');
 $router->addRoute('vehiculos/:id',      'PUT',      'VehiculosControler',         '');
-
 
 
 

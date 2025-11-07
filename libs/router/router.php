@@ -76,13 +76,15 @@ class Router {
         foreach ($this->routeTable as $route) {
             if ($route->match($url, $verb)) {
                 $route->run($this->request, $this->response);
-                if($this->response->hasFinished())
+                if($this->response->hasFinished()){
                     return;
+                }
             }
         }
         //Si ninguna ruta coincide con el pedido y se configuró ruta por defecto.
-        if ($this->defaultRoute != null)
+        if ($this->defaultRoute != null){
             $this->defaultRoute->run($this->request, $this->response);
+        }
     }
 
     public function addMiddleware($middleware) {

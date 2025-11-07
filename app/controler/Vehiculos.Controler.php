@@ -12,23 +12,25 @@
         }
 
         // ==== HOME ====
-        // function showHomeUser($request) {
-        //     $modelos = $this->model->getCarModel();
-        //     $this->veiw->showTaksVehiculosUser($modelos, $request->user);
-        // }
 
         function showHome($req, $res) {
-            if (isset($req->query->marca)) {
+            $parametros = $this->comprobacionDeQuerysParams($req, $res);
 
-                $marca = (int)$req->query->marca;
-
-                $modelos = $this->model->getCarModel();
-
-            }else{
-                $modelos = $this->model->getCarModel();
-
-                
+            // si devuelve null, hay error
+            if ($parametros === null) {
+                return $res->json("Parámetros inválidos o inexistentes.", 400);
             }
+
+            // si no pasaron ningún parámetro, traer todos
+            if (empty($req->query)) {
+                $modelos = $this->model->getCarModel();
+            } else {
+                $filtro = $parametros->marcas;
+                $sort = $parametros->sorts;
+                $order = $parametros->orders;
+                $modelos = $this->model->getCarModels($filtro, $sort, $order);
+            }
+
             return $res->json($modelos);
         }
 
@@ -61,12 +63,12 @@
         // ==== ACCIONES ====
         function sellCar($id) {
             $this->model->updateCar($id);
-            header("Location: " . BASE_URL . "modelos");
+            // header("Location: " . BASE_URL . "modelos");
         }
 
         function eraseCar($id) {
             $this->model->deleteCar($id);
-            header("Location: " . BASE_URL . "modelos");
+            // header("Location: " . BASE_URL . "modelos");
         }
 
 
@@ -149,6 +151,60 @@
             return $res->json($NuevoVehiculo,201);
         }
 
-    }
+        //////////////////funcion de filtros
+
+        function comprobacionDeQuerysParams($req,$res) {
+            $params = new stdClass();
+            $params->marcas = null;
+            $params->sorts = null;
+            $params->orders = ' ASC ';
+            
+            
+            if (isset($req->query->marcas)) {
+                
+                $nom_marca = ($req->query->marcas);
+                
+                $marcas = $this->modelMarca->getCarBrandByName($nom_marca);
+
+                
+
+                if (!$marcas) {
+                    return $res->json('la marca seleccionada no existe .', 404 );
+                }
+                $params->marcas = $marcas->id;
+
+            }
+            
+            //////////// verificacion del sort 
+
+            if (isset($req->query->sort)) {
+                $sort = $req->query->sort;
+                
+                //pido las columnas de la tabla vehiculos.
+                $columnas = $this->model->getColumnas();
+                
+                //verificar si el campo existe.
+                if(in_array($sort, $columnas)){
+                    $params->sorts = $sort;
+                }else {
+                    return $res->json('la marca seleccionada no existe .', 404 );
+                }
+            }
+            
+
+            if (isset($req->query->order)) {
+                $order = strtoupper($req->query->order);
+                
+
+                if ($order == 'DESC' || $order == 'ASC') {
+                    $params->orders = $order;
+                }
+                
+            }
+            
+
+            return $params;
+        }
     
+    } 
 ?>
