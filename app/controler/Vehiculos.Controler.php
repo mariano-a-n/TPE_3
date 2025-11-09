@@ -20,24 +20,30 @@
         // }
 
         function showHome($req, $res) {
+
             if (isset($req->query->marca)) {
-
                 $marca = (int)$req->query->marca;
-
-                if (isset($req->query->sort)) {
-                    $sort = $req->query->sort;
-                }
-
-                if (isset($req->query->order)) {
-                    $order = strtoupper($req->query->order);
-                }
-                    $modelos = $this->model->getVehiculosByMarca($marca);
             } else {
-                $modelos = $this->model->getCarModel();
-
-
+                $vehiculos = $this->model->getCarModel();          
             }
-            return $res->json($modelos);
+
+            if (isset($req->query->sort)) {
+                $sort = $req->query->sort;
+            }
+    
+            if (isset($req->query->order)) {
+                $order = strtoupper($req->query->order);
+            }
+
+            $vehiculos = $this->model->getCarsOrderedByPrecio($sort, $order);
+
+            if(!$vehiculos){
+              return $res->json("Error", 400);  
+            }
+
+            // var_dump($req, $res);
+            // die();
+            return $res->json($vehiculos, 200);
         }
 
         // ==== VEHÍCULOS ====
@@ -46,7 +52,7 @@
             $vehiculo = $this->model-> getCarById($id);
 
             if (!$vehiculo) {
-                return $res->json("el vehiculo con el id=$id no existe", 404);
+                return $res->json("El vehiculo con el id=$id no existe", 404);
             }
             return $res->json($vehiculo, 200);
         }
@@ -58,7 +64,7 @@
 
         function orderCarByPrecio($req, $res) {
             $order = $req->params->order ?? 'ASC';
-            $modelos = $this->model->getCarsOrderedByPrecio($order);
+            $modelos = $this->model->getCarsOrderedByPrecio($order, $req);
 
             if (empty($modelos)) {
                 return $res->json("No se encontraron vehículos", 404);
@@ -87,7 +93,7 @@
                 return $res->json('Faltan datos', 400);
             }
 
-            if (empty($req->body->km) || !isset($req->body->km)) {
+            if (!isset($req->body->km)) {
                 return $res->json('Faltan datos', 400);
             }
             
@@ -95,7 +101,7 @@
                 return $res->json('Faltan datos', 400);
             }
 
-            if (empty($req->body->patente) || !isset($req->body->patente)) {
+            if (!isset($req->body->patente)) {
                 return $res->json('Faltan datos', 400);
             }
 
@@ -131,7 +137,7 @@
             }
 
             // actualizo el auto
-            $this->model->updateModelCar($id_marca, $modelo, $anio, $km, $precio, $patente, $es_nuevo, $imagen);
+            $this->model->updateModelCar($id_marca, $modelo, $anio, $km, $precio, $patente, $es_nuevo, $imagen, $id);
             // obtengo auto modificado y devuelvo la respuesta
             $modelo = $this->model->getCarById($id);
             return $res->json("El vehículo id=$id actualizado con éxito", 200);

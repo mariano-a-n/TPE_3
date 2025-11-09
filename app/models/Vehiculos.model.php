@@ -39,13 +39,15 @@ require_once 'app/models/model.php';
             return $this->db->lastInsertId();
         }
 
-        function updateModelCar($id_marca, $modelo, $anio, $km, $precio, $patente, $es_nuevo, $imagen) {
-            $query = $this->db->prepare("UPDATE vehiculos SET id_marca=?, modelo=?, anio=?, km=?, precio=?, patente=?, es_nuevo=?, imagen=?, vendido=? WHERE id=?");
-            $query->execute($modelo, $anio, $km, $precio, $patente, $es_nuevo, $imagen, $id_marca);
+        function updateModelCar($id_marca, $modelo, $anio, $km, $precio, $patente, $es_nuevo, $imagen, $id) {
+            $query = $this->db->prepare("UPDATE vehiculos SET id_marca=?, modelo=?, anio=?, km=?, precio=?, patente=?, es_nuevo=?, imagen=? WHERE id=?");
+            $query->execute([$id_marca, $modelo, $anio, $km, $precio, $patente, $es_nuevo, $imagen, $id]);
         }
 
-        function getCarsOrderedByPrecio($order) {
-            $query = $this->db->prepare("SELECT * FROM vehiculos ORDER BY precio $order");
+        function getCarsOrderedByPrecio($sort, $order) {
+            $sql = " SELECT * FROM vehiculos ORDER BY ";
+            
+            $query = $this->db->prepare($sql . $sort . " " . $order);
             $query->execute();
             return $query->fetchAll(PDO::FETCH_OBJ);
         }
