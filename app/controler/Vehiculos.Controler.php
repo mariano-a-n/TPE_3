@@ -18,15 +18,17 @@
         //     $modelos = $this->model->getCarModel();
         //     $this->veiw->showTaksVehiculosUser($modelos, $request->user);
         // }
-
+        
         function showHome($req, $res) {
-
-            if (isset($req->query->marca)) {
-                $marca = (int)$req->query->marca;
-            } else {
-                $vehiculos = $this->model->getCarModel();          
+            $vehiculos = $this->model->getCarModel();
+            if(!$vehiculos){
+              return $res->json("Error", 400);
             }
 
+            // valores por defecto
+            $sort = 'id';
+            $order = 'ASC';
+            
             if (isset($req->query->sort)) {
                 $sort = $req->query->sort;
             }
@@ -36,10 +38,6 @@
             }
 
             $vehiculos = $this->model->getCarsOrderedByPrecio($sort, $order);
-
-            if(!$vehiculos){
-              return $res->json("Error", 400);  
-            }
 
             // var_dump($req, $res);
             // die();
@@ -193,7 +191,7 @@
                 return $res->json('Faltan datos', 400);
             }
 
-            if (empty($req->body->imagen) || !isset($req->body->imangen)) {
+            if (empty($req->body->imagen) || !isset($req->body->imagen)) {
                 return $res->json('Faltan datos', 400);
             }
 
