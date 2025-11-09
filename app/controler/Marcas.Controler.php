@@ -46,7 +46,7 @@
 
             $vehiculos = $this->modelCar->getVehiculosByMarca($id);
             if (count($vehiculos) > 0) {
-                return $res->json("no puedes eliminar esta marca porque existen veiculos asociados");
+                return $res->json("no puedes eliminar esta marca porque existen veiculos asociados",409);
             }
 
             //borro la marca que del id que pase
@@ -67,7 +67,7 @@
             
 
             if (count($marca) <= 0) {
-                return $res->json('la marca no existe');
+                return $res->json('la marca no existe o no esta registrada en el sistema', 404);
             }
             
             $vehiculos = $this->modelCar->getVehiculosByMarca($marca->id);
@@ -100,8 +100,8 @@
             }
 
             
-            $nuevaMarca = $this->model->getCarBrandById($id_insertado);
-            return $res->json($nuevaMarca, 201); 
+            // $nuevaMarca = $this->model->getCarBrandById($id_insertado);
+            return $res->json("Recurso creado correctamente  $id_insertado", 201); 
         }
 
 
@@ -113,7 +113,7 @@
             $marca = $this->model-> getCarBrandById($id);
 
             if (!$marca) {
-                return $res->json("La marca con el id=$id no existe", 404);
+                return $res->json("La marca con el id= $id no existe", 404);
             }
 
             if (empty($req->body->marca) || !isset($req->body->marca)) {

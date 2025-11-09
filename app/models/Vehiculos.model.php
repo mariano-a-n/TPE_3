@@ -54,24 +54,17 @@ require_once 'app/models/model.php';
         if (empty($sorts)){
             $sorts = 'id';
         }  
-        if (empty($orders)){
-            $orders = 'ASC';
-        } 
-    
-
+        
         $sql = "SELECT * FROM vehiculos ";
+        
         // $params = [];
-
+        
         
         if (!empty($filtros)) {
             $flitro = " WHERE id_marca = ". $filtros;
-            // $sql .= " WHERE id_marca = ?";
-            // $params[] = $filtros;
+            $sql .= $flitro . " ORDER BY $sorts $orders";
         }
-
-        $sql .= $flitro . " ORDER BY $sorts $orders";
         
-
 
         // 2. consulta SQL (SELECT * FROM vehiculos)
         $query = $this->db->prepare($sql);

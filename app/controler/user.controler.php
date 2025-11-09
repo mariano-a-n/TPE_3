@@ -1,53 +1,54 @@
+
 <?php
 require_once './app/models/user.model.php';
-require_once './app/veiws/user.view.php';
 
+require_once './libs/jwt/jwt.php';
 
-class userController {
+class AuthApiController {
     private $userModel;
-    private $view;
 
-    function __construct() {
+    public function __construct() {
         $this->userModel = new UserModel();
-        $this->view = new userView();
     }
 
-    public function showLogin($request) {
-        // muestra el formulario de login
-        $this->view->showLogin($request->user);
-    }
+    public function login($request, $response) {
+        // Leer el ecabezado Authorization
+        $authorization = $request->authorization;
 
-    public function doLogin($request) {
-        // 1. validar que se hayan enviado los campos
-        if (empty($_POST['user']) || empty($_POST['password'])) {
-            return $this->view->showLogin ($request->user);
+        // Chequear que el encabezado sea 'Basic base64(user:pass)'
+        $auth = explode(' ', $authorization);
+        if (count($auth) != 2 || $auth[0] !== 'Basic') {
+            // Si no es correcto, devolver error 401 Unauthorized
+            header("WWW-Authenticate: Basic realm='Get a token'");
+            return $response->json("Autenticación no valida", 401);
         }
 
-        // 2. obtener datos del formulario
-        $email = $_POST['user'];
-        $password = $_POST['password'];
+        $auth = base64_decode($auth[1]); // "user:pass"
+        $user_pass = explode(":", $auth);
+        if (count($user_pass) != 2) {
+            // Si no es correcto, devolver error 401 Unauthorized
+            return $response->json("Autenticación no valida", 401);
+        }
 
-        // 3. buscar el usuario en la base de datos
-        $userFromDB = $this->userModel->getByUser($email);
+        $user = $user_pass[0];
+        $password = $user_pass[1];
+        // Buscar el usuario en la DB
+        $userFromDB = $this->userModel->getByUser($user);
         
-        // 4. verificar que exista y que la contraseña coincida
-        if ($userFromDB && password_verify($password, $userFromDB->contraseña)) {
-            // 5. guardar datos del usuario en la sesión
-            $_SESSION['USER_ID'] = $userFromDB->id;
-            $_SESSION['USER_EMAIL'] = $userFromDB->email;
-
-            // 6. redirigir a home
-            header("Location: " . BASE_URL . "home"); 
-            exit;
-        } else {
-            // si no coincide, mostrar error
-            return $this->view->showLogin($request->user);
+        // verificar la contreaseña con la de la base (hasheada)
+        if(!$userFromDB || !password_verify($password, $userFromDB->contraseña)) {
+            return $response->json("Usuario o contraseña incorrecta", 401);
         }
+
+        // Si todo está bien, devolvemos un token
+        $payload = [
+            'sub' => $userFromDB->id,
+            'usuario' => $userFromDB->usuario,
+            'roles' => ['ADMIN', 'USER', 'BANANA'],
+            'exp' => time() + 3600 // Expira en 1 hora
+        ];
+
+        return $response->json(createJWT($payload));
     }
 
-    public function logout($request) {
-        session_destroy();
-        header("Location: " . BASE_URL . "login");
-        exit;
-    }
 }
