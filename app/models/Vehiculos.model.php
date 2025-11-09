@@ -45,9 +45,8 @@ require_once 'app/models/model.php';
         }
 
         function getCarsOrderedByPrecio($sort, $order) {
-            $sql = " SELECT * FROM vehiculos ORDER BY ";
-            
-            $query = $this->db->prepare($sql . $sort . " " . $order);
+            // $sql = "SELECT * FROM vehiculos ORDER BY $sort $order";
+            $query = $this->db->prepare("SELECT * FROM vehiculos ORDER BY $sort $order");
             $query->execute();
             return $query->fetchAll(PDO::FETCH_OBJ);
         }
