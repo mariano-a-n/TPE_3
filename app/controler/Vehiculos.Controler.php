@@ -22,7 +22,7 @@
         function showHome($req, $res) {
             $vehiculos = $this->model->getCarModel();
             if(!$vehiculos){
-              return $res->json("Error", 400);
+              return $res->json("Error", 404); // no se ha encontrado
             }
 
             // valores por defecto
@@ -41,7 +41,7 @@
 
             // var_dump($req, $res);
             // die();
-            return $res->json($vehiculos, 200);
+            return $res->json($vehiculos, 200); // ok
         }
 
         // ==== VEHÍCULOS ====
@@ -50,9 +50,9 @@
             $vehiculo = $this->model-> getCarById($id);
 
             if (!$vehiculo) {
-                return $res->json("El vehiculo con el id=$id no existe", 404);
+                return $res->json("El vehiculo con el id=$id no existe", 404); // no se ha encontrado
             }
-            return $res->json($vehiculo, 200);
+            return $res->json($vehiculo, 200); // ok
         }
 
         function showCarDetails($id) {
@@ -65,21 +65,25 @@
             $modelos = $this->model->getCarsOrderedByPrecio($order, $req);
 
             if (empty($modelos)) {
-                return $res->json("No se encontraron vehículos", 404);
+                return $res->json("No se encontraron vehículos", 404); // no se ha encontrado
             }
 
             return $res->json($modelos);
         }
 
-        function refreshCar($req, $res) {
+        function refreshCar($req, $res) { // PUT
             $id = $req->params->id;
             $modelo = $this->model->getCarModel($id);
 
             if (!$modelo) {
-                return $res->json("Vehículo con id=$id no encontrado", 404);
+                return $res->json("Vehículo con id=$id no encontrado", 404); // no se ha encontrado
             }
             
             if (empty($req->body->id_marca) || !isset($req->body->id_marca)) {
+                return $res->json('Faltan datos', 400); // bad request
+            }
+
+            if (empty($req->body->marca) || !isset($req->body->marca)) {
                 return $res->json('Faltan datos', 400);
             }
             
@@ -108,6 +112,7 @@
             }
 
             $id_marca = $req->body->id_marca;
+            $marca = $req->body->marca;
             $modelo = trim($req->body->modelo);
             $anio = (int) $req->body->anio;
             $km = (int) $req->body->km;
@@ -135,10 +140,10 @@
             }
 
             // actualizo el auto
-            $this->model->updateModelCar($id_marca, $modelo, $anio, $km, $precio, $patente, $es_nuevo, $imagen, $id);
+            $this->model->updateModelCar($id_marca, $marca, $modelo, $anio, $km, $precio, $patente, $es_nuevo, $imagen, $id);
             // obtengo auto modificado y devuelvo la respuesta
             $modelo = $this->model->getCarById($id);
-            return $res->json("El vehículo id=$id actualizado con éxito", 200);
+            return $res->json("El vehículo id=$id actualizado con éxito", 202); // aceptado
         }
 
         function usedCars($id) {
@@ -165,7 +170,7 @@
 
         function addCarVehiculo($req, $res) {
 
-            //comprubo los datos
+            //compruebo los datos
 
             if (empty($req->body->id_marca) || !isset($req->body->id_marca)) {
                 return $res->json('Faltan datos', 400);
@@ -222,23 +227,23 @@
 
             //comprovacion de logica  si es nuevo no puede tener mas de 0 km
             if ($es_nuevo == 1 && $km > 0) {
-            return $res->json('error: Un vehículo nuevo no puede tener kilómetros.', 400);
+            return $res->json('error: Un vehículo nuevo no puede tener kilómetros.', 406); // no aceptable
             }
             //
             if ($es_nuevo == 0 && $km <= 0) {
-            return $res->json('error: El vehiculo es usado pero tiene 0 km .', 400);
+            return $res->json('error: El vehiculo es usado pero tiene 0 km .', 406); // no aceptable
             }
 
             //comprobacion de la marca
             
 
             if (!empty($req->body->vendido) || ($req->body->vendido == 1)) {
-                return $res->json('error El vehículo no puede registrarse como vendido al crearse.', 400);
+                return $res->json('error El vehículo no puede registrarse como vendido al crearse.', 401); // no autorizado
             }
             
-            $NuevoVehiculo = $this->model->insertCar($id_marca,$modelo,$anio,$km,$precio,$patente,$es_nuevo,$imagen);
+            $NuevoVehiculo = $this->model->insertCar($id_marca,$marca,$modelo,$anio,$km,$precio,$patente,$es_nuevo,$imagen);
 
-            return $res->json($NuevoVehiculo,201);
+            return $res->json($NuevoVehiculo, 201); // creado
         }
 
     }
