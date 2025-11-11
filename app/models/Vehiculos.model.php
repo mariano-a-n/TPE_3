@@ -33,7 +33,7 @@ require_once 'app/models/model.php';
         }
 
         function insertCar($id_marca, $marca, $modelo, $anio, $km, $precio, $patente, $es_nuevo, $imagen) {
-            $query = $this->db->prepare("INSERT INTO vehiculos(id_marca, marca, modelo, anio, km, precio, patente, es_nuevo, imagen) VALUES (?,?,?,?,?,?,?,?)");
+            $query = $this->db->prepare("INSERT INTO vehiculos(id_marca, marca, modelo, anio, km, precio, patente, es_nuevo, imagen) VALUES (?,?,?,?,?,?,?,?,?)");
             $query->execute([$id_marca, $marca, $modelo, $anio, $km, $precio, $patente, $es_nuevo, $imagen]);
 
             return $this->db->lastInsertId();
