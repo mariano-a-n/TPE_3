@@ -17,11 +17,11 @@ $router->addRoute('marcas/:id',      'DELETE',   'MarcasControler',         'rem
 $router->addRoute('marcas',          'POST',     'MarcasControler',         '');
 $router->addRoute('marcas/:id',      'PUT',      'MarcasControler',         '');
 
-/// VEHICULOS / 
+/// VEHICULOS /
 $router->addRoute('vehiculos',        'GET',      'VehiculosControler',     'showHome');
 $router->addRoute('vehiculos/:id',    'GET',      'VehiculosControler',     'showCarBrandById');
 
-$router->addRoute('vehiculos/:id',    'DELETE',   'VehiculosControler',     '');
+$router->addRoute('vehiculos/:id',    'DELETE',   'VehiculosControler',     'deleteCar');
 $router->addRoute('vehiculos',        'POST',     'VehiculosControler',     'addCarVehiculo');
 $router->addRoute('vehiculos/:id',    'PUT',      'VehiculosControler',     'refreshCar');
 
