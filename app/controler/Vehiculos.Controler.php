@@ -145,9 +145,17 @@
             // header("Location: " . BASE_URL . "modelos");
         }
 
-        function eraseCar($id) {
-            $this->model->deleteCar($id);
-            // header("Location: " . BASE_URL . "modelos");
+        function deleteCar($req, $res) {
+            $id = $req->params->id;
+            $modelo = $this->model->getCarById($id);
+
+            if (!$modelo) {
+                return $res->json("El vehículo con el id=$id no existe, 404");
+            }
+
+            $this->model->removeCar($id);
+
+            return $res->json("El vehículo con el id=$id se eliminó con éxito");
         }
         
         function validarDatos($req, $res) {
