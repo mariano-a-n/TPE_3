@@ -27,7 +27,7 @@ require_once 'app/models/model.php';
             $query->execute([$id]);
         }
 
-        function deleteCar($id) {
+        function removeCar($id) {
             $query = $this->db->prepare('DELETE FROM vehiculos WHERE id = ?');
             $query->execute([$id]);
         }
