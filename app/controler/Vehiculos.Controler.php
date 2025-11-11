@@ -8,7 +8,7 @@
         private $params;
 
         function __construct(){
-            $this->params = (object) $_GET;
+            // $this->params = (object) $_GET;
             $this->model = new ModelVehiculos();
             $this->modelMarca =  new ModelMarcas();
         }
@@ -126,7 +126,7 @@
 
             // obtengo auto modificado y devuelvo la respuesta
             $modelo = $this->model->getCarById($id);
-            return $res->json("El vehículo id=$id actualizado con éxito", 202); // aceptado
+            return $res->json("El vehículo id=$id actualizado con éxito", 200); // ok
         }
 
         function usedCars($id) {
