@@ -21,8 +21,10 @@
         
         function showHome($req, $res) {
             $vehiculos = $this->model->getCarModel();
-            if(!$vehiculos){
-              return $res->json("Error", 404); // no se ha encontrado
+            if (empty($vehiculos)){
+              return $res->json([ // array asociativo para el error
+                "error"=>true,
+                "message"=>"No se encontraron modelos de vehículos"], 404); // no se ha encontrado
             }
 
             // valores por defecto
@@ -41,7 +43,10 @@
 
             // var_dump($req, $res);
             // die();
-            return $res->json($vehiculos, 200); // ok
+            return $res->json([
+                "error"=>false,
+                "data"=>$vehiculos
+            ], 200); // ok
         }
 
         // ==== VEHÍCULOS ====
@@ -50,9 +55,15 @@
             $vehiculo = $this->model-> getCarById($id);
 
             if (!$vehiculo) {
-                return $res->json("El vehiculo con el id=$id no existe", 404); // no se ha encontrado
+                return $res->json([
+                    "error" => true,
+                    "message" => "El vehiculo con el id=$id no existe"
+                ], 404); // no se ha encontrado
             }
-            return $res->json($vehiculo, 200); // ok
+            return $res->json([
+                "error"=>false,
+                "data"=>$vehiculo
+            ], 200); // ok
         }
 
         function showCarDetails($id) {
@@ -65,20 +76,27 @@
             $modelos = $this->model->getCarsOrderedByPrecio($order, $req);
 
             if (empty($modelos)) {
-                return $res->json("No se encontraron vehículos", 404); // no se ha encontrado
+                return $res->json([
+                    "error" => true,
+                    "message" => "No se encontraron vehículos"
+                ], 404);
             }
-
-            return $res->json($modelos);
+            return $res->json([
+                "error" => false,
+                "data" => $modelos
+            ], 200);
         }
 
         function addCarVehiculo($req, $res) {
             $id_marca = (int) $req->body->id_marca;
             $marca = $this->modelMarca->getCarBrandById($id_marca);
     
-            if (!$marca) {
-                return $res->json('la marca seleccionada no existe .', 404 );
+            if (empty($marca)) {
+                return $res->json([
+                    "error" => true,
+                    "message" => "La marca seleccionada no existe"
+                ], 404);
             }
-            
             // agrego el auto
             $datos = $this->validarDatos($req, $res);
             $NuevoVehiculo = $this->model->insertCar(
@@ -97,16 +115,22 @@
             // if (!empty($req->body->vendido) || ($req->body->vendido == 1)) {
             //     return $res->json('error El vehículo no puede registrarse como vendido al crearse.', 401); // no autorizado
             // }
-                        
-            return $res->json($NuevoVehiculo, 201); // creado
+            return $res->json([
+                "error" => false,
+                "message" => "Vehículo agregado con éxito",
+                "data" => "id=$NuevoVehiculo"
+            ], 201); // creado
         }
 
         function refreshCar($req, $res) { // PUT
             $id = $req->params->id;
             $modelo = $this->model->getCarById($id);
             
-            if (!$modelo) {
-                return $res->json("Vehículo con id=$id no encontrado", 404); // no se ha encontrado
+            if (empty($modelo)) {
+                return $res->json([
+                    "error" => true,
+                    "message" => "Vehículo con id=$id no encontrado"
+                ], 404); // no se ha encontrado
             }
 
             // actualizo el auto
@@ -126,7 +150,11 @@
 
             // obtengo auto modificado y devuelvo la respuesta
             $modelo = $this->model->getCarById($id);
-            return $res->json("El vehículo id=$id actualizado con éxito", 200); // ok
+            return $res->json([
+                "error" => false,
+                "message" => "El vehículo id=$id actualizado con éxito",
+                "data" => $modelo
+            ], 200);
         }
 
         function usedCars($id) {
@@ -150,67 +178,75 @@
             $modelo = $this->model->getCarById($id);
 
             if (!$modelo) {
-                return $res->json("El vehículo con el id=$id no existe, 404");
+                return $res->json([
+                    "error" => true,
+                    "message" => "El vehículo con el id=$id no existe"
+                ], 404);
             }
-
             $this->model->removeCar($id);
 
-            return $res->json("El vehículo con el id=$id se eliminó con éxito");
+            return $res->json([
+                "error" => false,
+                "message" => "El vehículo con el id=$id se eliminó con éxito",
+                "data" => $modelo
+            ], 200);
         }
         
         function validarDatos($req, $res) {
-            if (empty($req->body->id_marca) || !isset($req->body->id_marca)) {
-                return $res->json('Faltan datos', 400); // bad request
+            $body = $req->body;
+
+            if (!isset($body->id_marca) || $body->id_marca === '') {
+                return $res->json('Faltan datos: id_marca', 400);
             }
 
-            if (empty($req->body->marca) || !isset($req->body->marca)) {
+            if (empty($body->marca)) {
                 return $res->json('Falta la marca', 400);
             }
-            
-            if (empty($req->body->modelo) || !isset($req->body->modelo)) {
+
+            if (empty($body->modelo)) {
                 return $res->json('Falta el modelo', 400);
             }
 
-            if (empty($req->body->anio) || !isset($req->body->anio)) {
+            if (empty($body->anio)) {
                 return $res->json('Falta el año', 400);
             }
 
-            if (!isset($req->body->km)) {
+            if (!isset($body->km)) {
                 return $res->json('Faltan los kilómetros', 400);
             }
-            
-            if (empty($req->body->precio) || !isset($req->body->precio)) {
+
+            if (!isset($body->precio)) {
                 return $res->json('Falta el precio', 400);
             }
 
-            if (!isset($req->body->patente)) {
+            if (!isset($body->patente)) {
                 return $res->json('Falta la patente', 400);
             }
 
-            if (empty($req->body->imagen) || !isset($req->body->imagen)) {
+            if (empty($body->imagen)) {
                 return $res->json('Falta la imagen', 400);
             }
 
-            $id_marca = $req->body->id_marca;
-            $marca = trim($req->body->marca);
-            $modelo = trim($req->body->modelo);
-            $anio = (int) $req->body->anio;
-            $km = (int) $req->body->km;
-            $precio = (float) $req->body->precio;
+            $id_marca = $body->id_marca;
+            $marca = trim($body->marca);
+            $modelo = trim($body->modelo);
+            $anio = (int) $body->anio;
+            $km = (int) $body->km;
+            $precio = (float) $body->precio;
 
             //strtoupper hece que todo el txt se vuelva en mayusculas
-            $patente = strtoupper(trim($req->body->patente));
+            $patente = strtoupper(trim($body->patente));
 
-            $imagen = trim($req->body->imagen);
+            $imagen = trim($body->imagen);
 
             // Campos opcionales es nuevo por default en la tabla siempre es nuevo
-            if (isset($req->body->es_nuevo)) {
-                $es_nuevo = (int) $req->body->es_nuevo;
+            if (isset($body->es_nuevo)) {
+                $es_nuevo = (int) $body->es_nuevo;
             } else {
                 $es_nuevo = 0;
             }
             // patente
-            if (empty($req->body->$patente)) {
+            if (empty($body->$patente)) {
                 $patente == null;
             }
             // comprobar si no tiene kilometros es nuevo
