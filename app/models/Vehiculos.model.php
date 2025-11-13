@@ -22,16 +22,6 @@ require_once 'app/models/model.php';
             return $query->fetchAll(PDO::FETCH_OBJ);
         }
         
-        function updateCar($id) {
-            $query = $this->db->prepare('UPDATE vehiculos SET vendido = 1 WHERE id = ?');
-            $query->execute([$id]);
-        }
-
-        function removeCar($id) {
-            $query = $this->db->prepare('DELETE FROM vehiculos WHERE id = ?');
-            $query->execute([$id]);
-        }
-
         function insertCar($id_marca, $marca, $modelo, $anio, $km, $precio, $patente, $es_nuevo, $imagen) {
             $query = $this->db->prepare("INSERT INTO vehiculos(id_marca, marca, modelo, anio, km, precio, patente, es_nuevo, imagen) VALUES (?,?,?,?,?,?,?,?,?)");
             $query->execute([$id_marca, $marca, $modelo, $anio, $km, $precio, $patente, $es_nuevo, $imagen]);
@@ -42,6 +32,21 @@ require_once 'app/models/model.php';
         function updateModelCar($id_marca, $marca, $modelo, $anio, $km, $precio, $patente, $es_nuevo, $imagen, $id) {
             $query = $this->db->prepare("UPDATE vehiculos SET id_marca=?, marca=?, modelo=?, anio=?, km=?, precio=?, patente=?, es_nuevo=?, imagen=? WHERE id=?");
             $query->execute([$id_marca, $marca, $modelo, $anio, $km, $precio, $patente, $es_nuevo, $imagen, $id]);
+        }
+        
+        function updateCar($id) {
+            $query = $this->db->prepare('UPDATE vehiculos SET vendido = 1 WHERE id = ?');
+            $query->execute([$id]);
+        }
+
+        function removeCar($id) {
+            $query = $this->db->prepare('DELETE FROM vehiculos WHERE id = ?');
+            $query->execute([$id]);
+        }
+
+        function patchField($set, $params) {
+            $query = $this->db->prepare("UPDATE vehiculos SET " . implode(', ', $set) . " WHERE id = ?");
+            $query->execute($params);
         }
 
         function getCarsOrderedByPrecio($sort, $order) {
