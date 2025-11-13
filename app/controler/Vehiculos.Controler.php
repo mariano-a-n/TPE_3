@@ -1,4 +1,4 @@
-<?php 
+<?php
     include_once 'app/models/Vehiculos.model.php';
     include_once 'app/models/Marcas.model.php';
 
@@ -87,7 +87,8 @@
             ], 200);
         }
 
-        function addCarVehiculo($req, $res) {
+                ///// POST //////
+        function postCar($req, $res) {
             $id_marca = (int) $req->body->id_marca;
             $marca = $this->modelMarca->getCarBrandById($id_marca);
     
@@ -121,8 +122,8 @@
                 "data" => "id=$NuevoVehiculo"
             ], 201); // creado
         }
-
-        function refreshCar($req, $res) { // PUT
+                ////// PUT //////
+        function putCar($req, $res) {
             $id = $req->params->id;
             $modelo = $this->model->getCarById($id);
             
@@ -157,22 +158,56 @@
             ], 200);
         }
 
-        function usedCars($id) {
-            $modelos = $this->model->getCarModel();
+                ///// PATCH //////
+        function patchCar($req, $res) {
+            $id = $req->params->id;
+            $modelo = $this->model->getCarById($id);
+            $input = json_decode(file_get_contents('php://input'), true);
+            // file_get_contents('php://input') lee el contenido bruto del cuerpo HTTP
+            // json_decode convierte contenido JSON en un array asociativo
+            
+            if (empty($modelo)) {
+                return $res->json([
+                    "error" => true,
+                    "message" => "Vehículo con id=$id no encontrado"
+                ], 404); // no se ha encontrado
+            }
+            
+            $allowedFields = ['marca', 'modelo', 'anio', 'km', 'precio', 'patente', 'imagen'];
+            $data = [];
+
+            foreach ($input as $field => $value) {
+                if (in_array($field, $allowedFields)) {
+                    $data[$field] = $value;
+                }
+            }
+
+            if (empty($data)) {
+                return $res->json([
+                    "error" => true,
+                    "message" => "No se enviaron campos válidos"
+                ]);
+            }
+
+            $set = [];
+            $params = [];
+            foreach ($data as $field => $value) {
+                $set[] = "$field = ?";
+                $params[] = $value;
+            }
+            $params[] = $id;
+            $this->model->patchField($set, $params);
+            $modeloActualizado = $this->model->getCarById($id);
+
+            return $res->json([
+                "error" => false,
+                "message" => "Se ha actualizado el campo del vehículo con id=$id",
+                "data" => $modeloActualizado
+            ], 200);
             
         }
 
-        function newCars($id) {
-            $modelos = $this->model->getCarModel();
-            
-        }
-
-        // ==== ACCIONES ====
-        function sellCar($id) {
-            $this->model->updateCar($id);
-            // header("Location: " . BASE_URL . "modelos");
-        }
-
+            //// DELETE /////
         function deleteCar($req, $res) {
             $id = $req->params->id;
             $modelo = $this->model->getCarById($id);
@@ -191,6 +226,23 @@
                 "data" => $modelo
             ], 200);
         }
+        
+        function usedCars() {
+            $modelos = $this->model->getCarModel();
+            
+        }
+
+        function newCars() {
+            $modelos = $this->model->getCarModel();
+            
+        }
+
+        // ==== ACCIONES ====
+        function sellCar($id) {
+            $this->model->updateCar($id);
+            // header("Location: " . BASE_URL . "modelos");
+        }
+
         
         function validarDatos($req, $res) {
             $body = $req->body;
