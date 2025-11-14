@@ -24,7 +24,7 @@
             if (empty($vehiculos)){
               return $res->json([ // array asociativo para el error
                 "error"=>true,
-                "message"=>"No se encontraron modelos de vehículos"], 404); // no se ha encontrado
+                "message"=>"No hay modelos de vehículos cargados"], 404); // no se ha encontrado
             }
 
             // valores por defecto
@@ -52,7 +52,7 @@
         // ==== VEHÍCULOS ====
         function showCarBrandById($req, $res) {
             $id = $req->params->id;
-            $vehiculo = $this->model-> getCarById($id);
+            $vehiculo = $this->model->getCarById($id);
 
             if (!$vehiculo) {
                 return $res->json([
@@ -60,31 +60,11 @@
                     "message" => "El vehiculo con el id=$id no existe"
                 ], 404); // no se ha encontrado
             }
+            
             return $res->json([
                 "error"=>false,
                 "data"=>$vehiculo
             ], 200); // ok
-        }
-
-        function showCarDetails($id) {
-            $modelos = $this->model->getCarModel($id);
-
-        }
-
-        function orderCarByPrecio($req, $res) {
-            $order = $req->params->order ?? 'ASC';
-            $modelos = $this->model->getCarsOrderedByPrecio($order, $req);
-
-            if (empty($modelos)) {
-                return $res->json([
-                    "error" => true,
-                    "message" => "No se encontraron vehículos"
-                ], 404);
-            }
-            return $res->json([
-                "error" => false,
-                "data" => $modelos
-            ], 200);
         }
 
                 ///// POST //////
@@ -95,7 +75,7 @@
             if (empty($marca)) {
                 return $res->json([
                     "error" => true,
-                    "message" => "La marca seleccionada no existe"
+                    "message" => "Esa marca no existe"
                 ], 404);
             }
             // agrego el auto
@@ -173,7 +153,7 @@
                 ], 404); // no se ha encontrado
             }
             
-            $allowedFields = ['marca', 'modelo', 'anio', 'km', 'precio', 'patente', 'imagen'];
+            $allowedFields = ['marca', 'modelo', 'anio', 'km', 'precio', 'patente', 'imagen', 'vendido'];
             $data = [];
 
             foreach ($input as $field => $value) {
