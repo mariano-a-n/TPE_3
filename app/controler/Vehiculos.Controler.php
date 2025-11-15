@@ -176,8 +176,17 @@
                 $params[] = $value;
             }
             $params[] = $id;
+            if ($vendido = 1) {
+                $this->model->removeCar($id);
+                return $res->json([
+                    "error" => false,
+                    "message" => "Vehículo de id=$id vendido y eliminado de la base de datos",
+                    "data" => $this->model->getCarModel()
+                ]);
+            }
             $this->model->patchField($set, $params);
             $modeloActualizado = $this->model->getCarById($id);
+
 
             return $res->json([
                 "error" => false,
