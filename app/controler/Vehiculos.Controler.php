@@ -92,7 +92,12 @@
                 $datos['imagen']
             );
             
-            
+            if ($NuevoVehiculo) {
+                return $res->json([
+                    "error" =>true,
+                    "message" =>  "Ese vehículo ya fue agregado"
+                ]);
+            }
             // if (!empty($req->body->vendido) || ($req->body->vendido == 1)) {
             //     return $res->json('error El vehículo no puede registrarse como vendido al crearse.', 401); // no autorizado
             // }
