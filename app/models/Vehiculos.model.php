@@ -22,16 +22,16 @@ require_once 'app/models/model.php';
             return $query->fetchAll(PDO::FETCH_OBJ);
         }
         
-        function insertCar($id_marca, $marca, $modelo, $anio, $km, $precio, $patente, $es_nuevo, $imagen) {
-            $query = $this->db->prepare("INSERT INTO vehiculos(id_marca, marca, modelo, anio, km, precio, patente, es_nuevo, imagen) VALUES (?,?,?,?,?,?,?,?,?)");
-            $query->execute([$id_marca, $marca, $modelo, $anio, $km, $precio, $patente, $es_nuevo, $imagen]);
+        function insertCar($id_marca, $segmento, $marca, $modelo, $anio, $km, $precio, $patente, $es_nuevo, $imagen) {
+            $query = $this->db->prepare("INSERT INTO vehiculos(id_marca, segmento, marca, modelo, anio, km, precio, patente, es_nuevo, imagen) VALUES (?,?,?,?,?,?,?,?,?,?)");
+            $query->execute([$id_marca, $segmento, $marca, $modelo, $anio, $km, $precio, $patente, $es_nuevo, $imagen]);
 
             return $this->db->lastInsertId();
         }
 
-        function updateModelCar($id_marca, $marca, $modelo, $anio, $km, $precio, $patente, $es_nuevo, $imagen, $id) {
-            $query = $this->db->prepare("UPDATE vehiculos SET id_marca=?, marca=?, modelo=?, anio=?, km=?, precio=?, patente=?, es_nuevo=?, imagen=? WHERE id=?");
-            $query->execute([$id_marca, $marca, $modelo, $anio, $km, $precio, $patente, $es_nuevo, $imagen, $id]);
+        function updateModelCar($id_marca, $segmento, $marca, $modelo, $anio, $km, $precio, $patente, $es_nuevo, $imagen, $id) {
+            $query = $this->db->prepare("UPDATE vehiculos SET id_marca=?, segmento=?, marca=?, modelo=?, anio=?, km=?, precio=?, patente=?, es_nuevo=?, imagen=? WHERE id=?");
+            $query->execute([$id_marca, $segmento, $marca, $modelo, $anio, $km, $precio, $patente, $es_nuevo, $imagen, $id]);
         }
         
         function updateCar($id) {
