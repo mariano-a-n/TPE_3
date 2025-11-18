@@ -70,18 +70,21 @@
                 ///// POST //////
         function postCar($req, $res) {
             $id_marca = (int) $req->body->id_marca;
-            $marca = $this->modelMarca->getCarBrandById($id_marca);
+            $marcaId = $this->modelMarca->getCarBrandById($id_marca);
     
-            if (empty($marca)) {
+            if (!isset($marcaId)) {
                 return $res->json([
                     "error" => true,
-                    "message" => "Esa marca no existe"
+                    "message" => "Falta ingresar el id de la marca"
                 ], 404);
             }
-            // agrego el auto
+            // valido los datos ingresados
             $datos = $this->validarDatos($req, $res);
+            if (!$datos) return;
+            // agrego el auto
             $NuevoVehiculo = $this->model->insertCar(
                 $datos['id_marca'],
+                $datos['segmento'],
                 $datos['marca'],
                 $datos['modelo'],
                 $datos['anio'],
@@ -89,12 +92,12 @@
                 $datos['precio'],
                 $datos['patente'],
                 $datos['es_nuevo'],
-                $datos['imagen']
+                $datos['imagen'],
             );
             
-            if (!empty($req->body->vendido) || ($req->body->vendido == 1)) {
-                return $res->json('error El vehículo no puede registrarse como vendido al crearse.', 401); // no autorizado
-            }
+            // if (!empty($req->body->vendido) || ($req->body->vendido == 1)) {
+            //     return $res->json('error El vehículo no puede registrarse como vendido al crearse.', 401); // no autorizado
+            // }
             
             return $res->json([
                 "error" => false,
@@ -118,6 +121,7 @@
             $datos = $this->validarDatos($req, $res);
             $this->model->updateModelCar(
                 $datos['id_marca'],
+                $datos['segmento'],
                 $datos['marca'],
                 $datos['modelo'],
                 $datos['anio'],
@@ -153,7 +157,7 @@
                 ], 404); // no se ha encontrado
             }
             
-            $allowedFields = ['marca', 'modelo', 'anio', 'km', 'precio', 'patente', 'imagen', 'vendido'];
+            $allowedFields = ['segmento', 'marca', 'modelo', 'anio', 'km', 'precio', 'patente', 'es_nuevo', 'imagen', 'vendido'];
             $data = [];
 
             foreach ($input as $field => $value) {
@@ -176,14 +180,14 @@
                 $params[] = $value;
             }
             $params[] = $id;
-            if ($vendido = 1) {
-                $this->model->removeCar($id);
-                return $res->json([
-                    "error" => false,
-                    "message" => "Vehículo de id=$id vendido y eliminado de la base de datos",
-                    "data" => $this->model->getCarModel()
-                ]);
-            }
+            // if ($vendido = 1) {
+            //     $this->model->removeCar($id);
+            //     return $res->json([
+            //         "error" => false,
+            //         "message" => "Vehículo de id=$id vendido y eliminado de la base de datos",
+            //         "data" => $this->model->getCarModel()
+            //     ]);
+            // }
             $this->model->patchField($set, $params);
             $modeloActualizado = $this->model->getCarById($id);
 
@@ -237,38 +241,67 @@
             $body = $req->body;
 
             if (!isset($body->id_marca) || $body->id_marca === '') {
-                return $res->json('Faltan datos: id_marca', 400);
+                return $res->json([
+                    "error" => true,
+                    "message" => "Faltan datos: id_marca"
+                ], 400);
+            }
+
+            if (empty($body->segmento)) {
+                return $res->json([
+                    "error" => true,
+                    "message" => "Falta indicar el tipo de vehículo"
+                ], 400);
             }
 
             if (empty($body->marca)) {
-                return $res->json('Falta la marca', 400);
+                return $res->json([
+                    "error" => true,
+                    "message" => "Falta ingresar la marca"
+                ], 400);
             }
 
             if (empty($body->modelo)) {
-                return $res->json('Falta el modelo', 400);
+                return $res->json([
+                    "error" => true,
+                    "message" => "Falta ingresar el modelo"
+                ], 400);
             }
 
             if (empty($body->anio)) {
-                return $res->json('Falta el año', 400);
+                return $res->json([
+                    "error" => true,
+                    "message" => "Falta ingresar el año"
+                ], 400);
             }
 
             if (!isset($body->km)) {
-                return $res->json('Faltan los kilómetros', 400);
+                return $res->json([
+                    "error" => true,
+                    "message" => "Falta ingresar los kilómetros"
+                ], 400);
             }
 
             if (!isset($body->precio)) {
-                return $res->json('Falta el precio', 400);
+                return $res->json([
+                    "error" => true,
+                    "message" => "Falta ingresar el precio"
+                ], 400);
             }
 
             if (!isset($body->patente)) {
-                return $res->json('Falta la patente', 400);
+                return $res->json([
+                    "error" => true,
+                    "message" => "Falta ingresar la patente"
+                ], 400);
             }
 
-            if (empty($body->imagen)) {
-                return $res->json('Falta la imagen', 400);
-            }
+            // if (empty($body->imagen)) {
+            //     return $res->json('Falta la imagen', 400);
+            // }
 
             $id_marca = $body->id_marca;
+            $segmento = trim($body->segmento);
             $marca = trim($body->marca);
             $modelo = trim($body->modelo);
             $anio = (int) $body->anio;
@@ -305,15 +338,16 @@
             // comprobacion de marca con el ID
             $objetoMarca = $this->modelMarca->getCarBrandByName($marca);
             if (!$objetoMarca) {
-                return $res->json('Esa marca no existe', 400);
+                return $res->json('Esa marca no existe en la base de datos', 400);
             }
             if ($id_marca != $objetoMarca->id) {
                 return $res->json('Marca no coincide con ID', 400);
             }
 
-            // Si todo está bien, devolvemos los datos procesados
+            // Si todo está bien devolvemos los datos procesados
             return [
                 'id_marca' => $id_marca,
+                'segmento' => $segmento,
                 'marca' => $marca,
                 'modelo' => $modelo,
                 'anio' => $anio,
