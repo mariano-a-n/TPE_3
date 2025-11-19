@@ -84,7 +84,7 @@
             // agrego el auto
             $NuevoVehiculo = $this->model->insertCar(
                 $datos['id_marca'],
-                $datos['segmento'],
+                $datos['tipo'],
                 $datos['marca'],
                 $datos['modelo'],
                 $datos['anio'],
@@ -121,7 +121,7 @@
             $datos = $this->validarDatos($req, $res);
             $this->model->updateModelCar(
                 $datos['id_marca'],
-                $datos['segmento'],
+                $datos['tipo'],
                 $datos['marca'],
                 $datos['modelo'],
                 $datos['anio'],
@@ -157,7 +157,7 @@
                 ], 404); // no se ha encontrado
             }
             
-            $allowedFields = ['segmento', 'marca', 'modelo', 'anio', 'km', 'precio', 'patente', 'es_nuevo', 'imagen', 'vendido'];
+            $allowedFields = ['tipo', 'marca', 'modelo', 'anio', 'km', 'precio', 'patente', 'es_nuevo', 'imagen', 'vendido'];
             $data = [];
 
             foreach ($input as $field => $value) {
@@ -219,6 +219,33 @@
                 "data" => $modelo
             ], 200);
         }
+
+        function filterCar($req, $res) {
+            $tipo = $req->getQueryParams()['tipo'] ?? null;
+            
+            if (!$tipo) {
+                return $res->json([
+                    "error" => true,
+                    "message" => "El vehículo del tipo=$tipo no existe"
+                ], 404);
+            }
+
+            $vehiculo = $this->model->getCarByFilter($tipo);
+
+            // Si no hay resultados
+            if (!$vehiculo || count($vehiculo) === 0) {
+                return $res->json([
+                    "error" => true,
+                    "message" => "No se encontraron vehículos del tipo=$tipo"
+                ], 400);
+            }
+
+            return $res->json([
+                "error" => false,
+                "message" => "Estos son los vechículos correpondientes al filtro",
+                "data" => $vehiculo
+            ]);
+        }
         
         function usedCars() {
             $modelos = $this->model->getCarModel();
@@ -247,7 +274,7 @@
                 ], 400);
             }
 
-            if (empty($body->segmento)) {
+            if (empty($body->tipo)) {
                 return $res->json([
                     "error" => true,
                     "message" => "Falta indicar el tipo de vehículo"
@@ -301,7 +328,7 @@
             // }
 
             $id_marca = $body->id_marca;
-            $segmento = trim($body->segmento);
+            $tipo = trim($body->tipo);
             $marca = trim($body->marca);
             $modelo = trim($body->modelo);
             $anio = (int) $body->anio;
@@ -310,7 +337,7 @@
 
             //strtoupper hece que todo el txt se vuelva en mayusculas
             $patente = strtoupper(trim($body->patente));
-
+            $es_nuevo = (int) $body->es_nuevo;
             $imagen = trim($body->imagen);
 
             // Campos opcionales es nuevo por default en la tabla siempre es nuevo
@@ -347,15 +374,15 @@
             // Si todo está bien devolvemos los datos procesados
             return [
                 'id_marca' => $id_marca,
-                'segmento' => $segmento,
+                'tipo' => $tipo,
                 'marca' => $marca,
                 'modelo' => $modelo,
                 'anio' => $anio,
                 'km' => $km,
                 'precio' => $precio,
                 'patente' => $patente,
-                'imagen' => $imagen,
-                'es_nuevo' => $es_nuevo
+                'es_nuevo' => $es_nuevo,
+                'imagen' => $imagen
             ];
 
         }
