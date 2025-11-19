@@ -147,8 +147,8 @@
             $id = $req->params->id;
             $modelo = $this->model->getCarById($id);
             $input = json_decode(file_get_contents('php://input'), true);
-            // file_get_contents('php://input') lee el contenido bruto del cuerpo HTTP
-            // json_decode convierte contenido JSON en un array asociativo
+            // file_get_contents('php://input') lee el contenido bruto del HTTP
+            // json_decode convierte el contenido JSON en un array asociativo
             
             if (empty($modelo)) {
                 return $res->json([
@@ -157,7 +157,7 @@
                 ], 404); // no se ha encontrado
             }
             
-            $allowedFields = ['tipo', 'marca', 'modelo', 'anio', 'km', 'precio', 'patente', 'es_nuevo', 'imagen', 'vendido'];
+            $allowedFields = ['tipo', 'marca', 'modelo', 'anio', 'km', 'precio', 'patente', 'es_nuevo', 'imagen', 'vendido']; // campos permitidos
             $data = [];
 
             foreach ($input as $field => $value) {
@@ -180,6 +180,7 @@
                 $params[] = $value;
             }
             $params[] = $id;
+            /* esto no funciona bien */
             // if ($vendido = 1) {
             //     $this->model->removeCar($id);
             //     return $res->json([
@@ -191,13 +192,11 @@
             $this->model->patchField($set, $params);
             $modeloActualizado = $this->model->getCarById($id);
 
-
             return $res->json([
                 "error" => false,
-                "message" => "Se ha actualizado el campo del vehículo con id=$id",
+                "message" => "Se ha actualizado el dato correspondiente del vehículo con id=$id",
                 "data" => $modeloActualizado
             ], 200);
-            
         }
 
             //// DELETE /////
