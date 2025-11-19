@@ -22,16 +22,16 @@ require_once 'app/models/model.php';
             return $query->fetchAll(PDO::FETCH_OBJ);
         }
         
-        function insertCar($id_marca, $segmento, $marca, $modelo, $anio, $km, $precio, $patente, $es_nuevo, $imagen) {
-            $query = $this->db->prepare("INSERT INTO vehiculos(id_marca, segmento, marca, modelo, anio, km, precio, patente, es_nuevo, imagen) VALUES (?,?,?,?,?,?,?,?,?,?)");
-            $query->execute([$id_marca, $segmento, $marca, $modelo, $anio, $km, $precio, $patente, $es_nuevo, $imagen]);
+        function insertCar($id_marca, $tipo, $marca, $modelo, $anio, $km, $precio, $patente, $es_nuevo, $imagen) {
+            $query = $this->db->prepare("INSERT INTO vehiculos(id_marca, tipo, marca, modelo, anio, km, precio, patente, es_nuevo, imagen) VALUES (?,?,?,?,?,?,?,?,?,?)");
+            $query->execute([$id_marca, $tipo, $marca, $modelo, $anio, $km, $precio, $patente, $es_nuevo, $imagen]);
 
             return $this->db->lastInsertId();
         }
 
-        function updateModelCar($id_marca, $segmento, $marca, $modelo, $anio, $km, $precio, $patente, $es_nuevo, $imagen, $id) {
-            $query = $this->db->prepare("UPDATE vehiculos SET id_marca=?, segmento=?, marca=?, modelo=?, anio=?, km=?, precio=?, patente=?, es_nuevo=?, imagen=? WHERE id=?");
-            $query->execute([$id_marca, $segmento, $marca, $modelo, $anio, $km, $precio, $patente, $es_nuevo, $imagen, $id]);
+        function updateModelCar($id_marca, $tipo, $marca, $modelo, $anio, $km, $precio, $patente, $es_nuevo, $imagen, $id) {
+            $query = $this->db->prepare("UPDATE vehiculos SET id_marca=?, tipo=?, marca=?, modelo=?, anio=?, km=?, precio=?, patente=?, es_nuevo=?, imagen=? WHERE id=?");
+            $query->execute([$id_marca, $tipo, $marca, $modelo, $anio, $km, $precio, $patente, $es_nuevo, $imagen, $id]);
         }
         
         function updateCar($id) {
@@ -53,6 +53,20 @@ require_once 'app/models/model.php';
             // $sql = "SELECT * FROM vehiculos ORDER BY $sort $order";
             $query = $this->db->prepare("SELECT * FROM vehiculos ORDER BY $sort $order");
             $query->execute();
+            return $query->fetchAll(PDO::FETCH_OBJ);
+        }
+
+        function getCarByFilter($tipo) {
+            $sql = "SELECT * FROM vehiculos";
+            $params = [];
+
+            if ($tipo) {
+                $sql .= " WHERE tipo = :tipo";
+                $params[':tipo'] = $tipo;
+            }
+            
+            $query = $this->db->prepare($sql);
+            $query->execute($params);
             return $query->fetchAll(PDO::FETCH_OBJ);
         }
         
