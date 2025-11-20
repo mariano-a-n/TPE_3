@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 22-10-2025 a las 05:14:46
+-- Tiempo de generación: 21-11-2025 a las 00:30:16
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -45,7 +45,8 @@ INSERT INTO `marcas` (`id`, `marca`, `nacionalidad`, `anio_de_creacion`) VALUES
 (5, 'Porsche', 'alemania', 1931),
 (6, 'Toyota', 'japon', 1937),
 (9, 'Renault', 'francia', 1899),
-(11, 'doge', 'argentina', 1990);
+(11, 'doge', 'argentina', 1990),
+(12, 'xcdvfbdcfvgb', 'dfg', 345654);
 
 -- --------------------------------------------------------
 
@@ -56,15 +57,17 @@ INSERT INTO `marcas` (`id`, `marca`, `nacionalidad`, `anio_de_creacion`) VALUES
 CREATE TABLE `usuarios` (
   `id` int(11) NOT NULL,
   `email` varchar(50) NOT NULL,
-  `contraseña` varchar(500) NOT NULL
+  `contraseña` varchar(500) NOT NULL,
+  `rol` varchar(50) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Volcado de datos para la tabla `usuarios`
 --
 
-INSERT INTO `usuarios` (`id`, `email`, `contraseña`) VALUES
-(1, 'webadmin@gmail.com', '$2a$12$GEZvn5wP9wiDlbJCPhVD/e7.cPUk4Dj3UuIq4FudKV/c.HIHkKfie');
+INSERT INTO `usuarios` (`id`, `email`, `contraseña`, `rol`) VALUES
+(1, 'webadmin@gmail.com', '$2a$12$GEZvn5wP9wiDlbJCPhVD/e7.cPUk4Dj3UuIq4FudKV/c.HIHkKfie', 'ADMIN'),
+(2, 'pruebaUser@gmail.com', '', 'USER');
 
 -- --------------------------------------------------------
 
@@ -90,12 +93,14 @@ CREATE TABLE `vehiculos` (
 --
 
 INSERT INTO `vehiculos` (`id`, `id_marca`, `modelo`, `anio`, `km`, `precio`, `patente`, `es_nuevo`, `imagen`, `vendido`) VALUES
-(1, 3, 'ford f-100', 1981, 1000, 1500000, 'SHY 893', 0, 'https://http2.mlstatic.com/D_NQ_NP_2X_742636-MLA89983452028_082025-F.webp', 0),
-(2, 6, 'corola', 2010, 0, 100000, 'gdfeygf', 1, '', 1),
-(3, 2, 'Chevrolet Onix', 2026, 0, 0, 'xtr 894 jk', 0, 'https://www.chevrolet.com.ar/content/dam/chevrolet/sa/argentina/espanol/vdc-collections/2024/cars/onix/jelly-flyout-onix.png?imwidth=3000', 0),
+(1, 3, 'ford f-100', 1981, 1000, 1500000, 'SHY 893', 0, 'https://http2.mlstatic.com/D_NQ_NP_2X_742636-MLA89983452028_082025-F.webp', 1),
 (4, 2, 'Chevrolet Onix Plus', 2026, 0, 0, 'JP329ZT', 0, 'https://www.chevrolet.com.ar/content/dam/chevrolet/sa/argentina/espanol/index/new-vsid/homepage/refresh-julio/flyout/jelly-flyout-onix-plus.png?imwidth=3000', 0),
 (5, 3, 'Bronco Sport', 2025, 0, 100, 'ER875XD', 0, 'https://www.ford.com.ar/content/dam/Ford/website-assets/latam/ar/home/showroom/fds/far-bronco-sport-showroom.jpg.dam.full.high.jpg/1741354285826.jpg', 0),
-(6, 3, 'BRONCO', 2024, 5, 1.5, 'ZXG78RT', 1, 'https://www.ford.com.ar/content/dam/Ford/website-assets/latam/ar/home/showroom/fds/far-showroom-bronco-badlands.jpg.dam.full.high.jpg/1749137924018.jpg', 0);
+(6, 3, 'BRONCO', 2024, 5, 1.5, 'ZXG78RT', 1, 'https://www.ford.com.ar/content/dam/Ford/website-assets/latam/ar/home/showroom/fds/far-showroom-bronco-badlands.jpg.dam.full.high.jpg/1749137924018.jpg', 0),
+(7, 2, 'Chevrolet POWER', 2025, 10, 10000, 'TTE 894 PK', 0, 'tt', 0),
+(9, 3, 'read POWER', 2025, 10, 10000, 'TTE 894 RK', 0, 'tt', 0),
+(10, 4, 'gol fullllll', 2000, 100, 100, 'FGH 345 DE', 0, 'tyjt', 0),
+(12, 6, 'feke', 2025, 0, 100000000, 'ADW 345 DA', 1, 'iri', 0);
 
 --
 -- Índices para tablas volcadas
@@ -129,19 +134,19 @@ ALTER TABLE `vehiculos`
 -- AUTO_INCREMENT de la tabla `marcas`
 --
 ALTER TABLE `marcas`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT de la tabla `usuarios`
 --
 ALTER TABLE `usuarios`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT de la tabla `vehiculos`
 --
 ALTER TABLE `vehiculos`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
 -- Restricciones para tablas volcadas

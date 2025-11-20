@@ -16,20 +16,6 @@ $router->addMiddleware(new JWTMiddleware());
 
 $router->addRoute('auth/login',     'GET',     'AuthApiController',    'login');
 
-
-// /// MARCAS / brads
-// $router->addRoute('marcas',      'GET',      'MarcasControler',         'getBrands');
-// $router->addRoute('marcas/:id',      'GET',      'MarcasControler',         'getBrandById');
-
-
-// $router->addMiddleware(new GuardMiddleware());
-
-// $router->addRoute('marcas/:id',      'DELETE',      'MarcasControler',         'removeBrend');
-// $router->addRoute('marcas/:id',      'POST',      'MarcasControler',         '');
-// $router->addRoute('marcas/:id',      'PUT',      'MarcasControler',         '');
-
-
-
 /// VEHICULOS / 
 
 $router->addRoute('vehiculos',      'GET',      'VehiculosControler',         'showHome');
