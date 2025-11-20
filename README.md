@@ -28,20 +28,65 @@ contraseña : admin
 
 ### Despliegue del sitio
 
-Copiar el proyecto dentro de la carpeta htdocs de XAMPP.
+**Instalación y configuración:**
 
-Crear una base de datos en phpMyAdmin e importar el archivo concesionaria.sql incluido en el proyecto.
+Copiar el proyecto dentro de la carpeta htdocs del entorno de XAMPP.
 
-Configurar los datos de conexión en app/config/config.php (host, usuario, contraseña y nombre de base)-> todo esta en predeterminadao (ya configurado avisar si hay probleas al ingresar) .
+Ejemplo de ruta:
 
-Iniciar Apache y MySQL, luego acceder desde el navegador a:
- http://localhost/TPE1/
+C:\xampp\htdocs\nombre_del_proyecto
 
-Usuario administrador:
+
+Crear la base de datos en phpMyAdmin e importar el archivo concesionaria.sql incluido en el proyecto.
+
+Esto generará automáticamente las tablas y datos iniciales necesarios.
+
+Configurar la conexión a la base de datos en el archivo:
+
+app/config/config.php
+
+
+Dentro encontrarás las constantes de conexión:
+
+define('MYSQL_HOST', 'localhost');
+define('MYSQL_USER', 'root');
+define('MYSQL_PASS', '');
+define('MYSQL_DB', '');
+
+
+# Todos los valores vienen configurados por defecto.
+Si ocurre algún problema al ingresar, revisar el acceso a la base o los datos del usuario MySQL.
+
+Iniciar Apache y MySQL desde el panel de control de XAMPP.
+
+Acceder al sitio desde el navegador:
+
+http://localhost/
+
+### Usuario administrador
 
 Usuario: webadmin@gmail.com
-
 Contraseña: admin
+
+### Requisitos para ejecutar y probar el proyecto
+
+Para poder ejecutar la API y probar los endpoints correctamente, se requiere instalar las siguientes herramientas:
+
+- Herramienta	Descripción	Enlace de descarga
+  XAMPP	Entorno que incluye Apache, MySQL y PHP. Necesario para ejecutar el servidor local y la base de datos.	Link De Descarga: https://www.apachefriends.org/es/download.html
+
+- Postman	Herramienta obligatoria para probar y enviar solicitudes HTTP a la API (GET, POST, PUT, DELETE). Link De Descarga: https://www.postman.com/downloads/
+
+- Visual Studio Code	Editor de código recomendado para abrir y editar los archivos del proyecto. Link De Descarga:	https://code.visualstudio.com/Download
+
+- phpMyAdmin	Incluido dentro de XAMPP. Se utiliza para crear y administrar la base de datos MySQL. Link De Descarga:	https://www.phpmyadmin.net/downloads/
+
+Uso de Postman (obligatorio para la API):
+Todos los endpoints de la API deben probarse mediante Postman.
+Desde allí podés enviar peticiones con diferentes métodos (GET, POST, PUT, DELETE) y observar las respuestas JSON generadas por el servidor.
+
+
+Cada endpoint tiene su propia documentación y ejemplos de uso dentro del archivo de referencia o el apéndice de endpoints.
 
 
 # API de Vehículos 
@@ -256,6 +301,48 @@ Respuesta exitosa ej:
 Respueta de error:
 return $res->json("el vehiculo con el id= $id no existe", 404);
 
+
+# !IMPORTANTE! #
+Para poder usar los siguentes Endpoints es necesario loguarce o usar el siguente token JWT :
+
+
+
+### GET /auth/login
+
+Descripción:
+sirve para como el mismo nombre indica loguearte. 
+
+
+**Ejemplo de uso:**
+
+GET http://localhost/web2/api/auth/login
+
+1- abra posman justo debajo de donde esta la peticiones (post get put etc..) y la url ahi unas pestañas/botones aprete el que dice authorization le aparecera un input de tipo select del lado izquierdo apretelo y se deplegaran varias opciones clikee la opcion que dice basic auth e ingrese el usuario y contraseña anterior mente dados (por si no lo vio son estos:Usuario: webadmin@gmail.com , Contraseña: admin) esto generara un token JWT copielo.
+
+2- ahora en input de tipo select del lado izquierdo apretelo nuevamente y ahora clikee la opcion que dice bearer token y pege el token genero.
+
+3- en caso de no dejarle crear el toque probar con con el sigiente punto el **token jtw duracion 15 dias desde su creacion**, ese token fue creado por mariano nesci con anterioridad y capas este generando incompatibilidad al querer crear otro si que se haya vencido el anteriro antes.
+
+Respueta de error:
+
+si el usuario no existe :
+return $res->json("Autenticación no valida", 401);
+
+si el token esta mal ingresado o no es el corecto :
+return $res->json("Autenticación no valida", 401);
+
+
+
+
+**token jtw duracion 15 dias desde su creacion**: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOjEsInVzdWFyaW8iOm51bGwsInJvbGVzIjpbIkFETUlOIiwiVVNFUiIsIkJBTkFOQSJdLCJleHAiOjE3NjQ4ODM3ODF9.UI4ki2827a9bocszvftIF8cxqPEqNqau_TKAWhq_Q_I 
+
+***uso del token***
+si no le deja loguarce o no reconoce el usuario utilice el toque dado que fue el ultimo creado hasta la fecha de entrega el token debe durar hasta el 4 de diciembre,aclaracion lo siguiente que se le va a explicar debe de hacerce con todos los Enpoints que requieran autorizacion osea (post,put,delete... otros si es que hay revisar api_router).
+abra posman justo debajo de donde esta la peticiones (post get put etc..) y la url ahi unas pestañas/botones aprete el que dice authorization le aparecera un input de tipo select del lado izquierdo apretelo y se deplegaran varias opciones clikee la opcion que dice bearer token y pege el token dado. 
+
+
+
+
 ### POST /vehiculos
 
 Descripción:
@@ -306,38 +393,78 @@ Respuesta exitosa (201 Created):
 
 ### PUT /vehiculos/:id
 
-Descripción:
-Actualiza la información de un vehículo existente identificado por su ID.
-Se deben enviar los nuevos datos del vehículo en formato JSON.
+Descripcion:
+función que se encarga de actualizar los datos de un vehículo en la base de datos. Se usa cuando se quiere modificar la información de un auto que ya está registrado, por ejemplo si cambió el precio o se corrigió algún dato. El método PUT requiere agregar todos los campos nuevamente, sean distintos o no
 
-Datos requeridos:
+#### paso a paso del PUT:
+* se obtiene el id del vehículo desde los parámetros de la URL y se guarda en la variable $id
 
-marca (string)
+* se busca ese vehículo en la base de datos con getCarById($id), función que está en model. Si no existe, se devuelve un JSON con el error 404 diciendo que no se encontró y dejando un registro de que ha sido error = true; esto puede servir para el desarrollador para registrar en una base de datos y luego contabilizar cuantos fallos hubo, o hacer un debugging para saber que endpoints fallan más y por que.
 
-modelo (string)
+* si el vehículo existe, se validan los datos nuevos que llegaron en el request (como marca, modelo, año, etc.) usando la función validarDatos para controlar que estén seteados, no vacíos, y en formato correcto.
 
-anio (integer)
+* luego se actualiza el vehículo con updateModelCar(...), pasando todos los datos nuevos junto con el id correspondiente, que es necesario para el UPDATE desde la base de datos de model y sepa que vehículo va a actualizar.
 
-**Ejemplo de uso:**
+* finalmente, se vuelve a buscar el vehículo ya actualizado y se devuelve en la respuesta formato JSON junto con un mensaje de éxito, el código 200, el error = false en este caso, y data = $modelo para que muestre los datos del vehículo ya actualizados.
 
-PUT http://localhost/web2/api/vehiculos/5
+* http://localhost/web2/TPE_3/api/vehiculos/:id es el endpoint  y permite mantener actualizada la información de los autos en la concesionaria. Hay que ingresar todos los datos nuevamente, con sus modificaciones, desde el 'body raw' en formato JSON .
+
+*** Ejemplo  de uso ***
+
+Solicitud:
+
+PUT http://localhost/web2/api/vehiculos/:id
 
 
-Body (JSON):
+Body (JSON) (campos actiales):
 
 {
-  
+  "id_marca": 2,
+  "modelo": "Road POWER",
+  "anio": 2025,
+  "km": 10,
+  "precio": 10000,
+  "patente": "ZTE 123 FK",
+  "es_nuevo": 0,
+  "imagen": "imagenautodsdd",
+  "vendido": 0
 }
 
+Body (JSON) (campos actualizados):
 
-Respuesta exitosa:
+{
+  "id_marca": 3,
+  "modelo": "Road full",
+  "anio": 2024,
+  "km": 100,
+  "precio": 10,
+  "patente": "ZTE 123 FK",
+  "es_nuevo": 0,
+  "imagen": "hfoashf",
+  "vendido": 0
+}
 
-{ "mensaje": "Vehículo actualizado correctamente" }
+(todo esto es solo un ejemplo).
 
+<!-- 
+### paso a paso del PATCH?
 
-Error (ID no existente):
+obtiene el ID del vehículo desde los parámetros de la URL ($req->params->id)
 
-{ "error": "Vehículo no encontrado." }
+busca el vehículo en la base de datos usando ese ID. Si no existe, devuelve respuesta en formato JSON con el código de error 404, un mensaje claro y un registro del error
+
+lee el contenido bruto del HTTP con file_get_contents('php://input') y lo decodifica desde JSON a un array asociativo ($input). Permite acceder a los campos enviados por el cliente
+
+filtra los campos permitidos: solo se consideran válidos los campos definidos en $allowedFields ('tipo', 'marca', 'modelo', 'anio', 'km', 'precio', 'patente', 'es_nuevo', 'imagen', 'vendido'). Esto evita que se actualicen campos no autorizados o inexistentes
+
+valida que haya al menos un campo válido. Si no se envió ninguno, responde con un error 400 indicando que no se enviaron campos válidos
+
+ejecuta la actualización usando el método patchField del modelo mediante $this->model->patchField($id, $data), que aplica la actualización en la base de datos
+
+vuelve a consultar el vehículo actualizado y lo devuelve en la respuesta en formato JSON junto con un mensaje de éxito, código HTTP 200 de éxito, y muestra el array "data" con la nueva infomación del vehículo
+
+http://localhost/web2/TPE_3/api/vehiculos/:id es el endpoint con el id del vehículo a modificar para ingresar y hacer cambio de 1 dato o mas de 1 desde el 'body raw' mediante formato JSON  -->
+
 
 ### DELETE /vehiculos/:id
 

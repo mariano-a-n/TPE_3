@@ -11,6 +11,7 @@ class AuthApiController {
         $this->userModel = new UserModel();
     }
 
+
     public function login($request, $response) {
         // Leer el ecabezado Authorization
         $authorization = $request->authorization;
