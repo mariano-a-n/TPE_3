@@ -73,6 +73,15 @@
             return $query->fetch(PDO::FETCH_OBJ);
 
         }
+    
+    public function getByMarca($marca) {
+        $query = $this->db->prepare("SELECT * FROM marcas WHERE marca = ?");
+        $query->execute([$marca]);
+        return $query->fetch(PDO::FETCH_OBJ);
     }
+
+
+    }
+
 
 ?> 

@@ -74,34 +74,53 @@
             return $vehiculos;
         }
 
+        function NormalizarMarca($texto) {
+            // Quitar espacios al inicio / fin
+            $texto = trim($texto);
+
+            // Convertir múltiple espacios en uno solo
+            $texto = preg_replace('/\s+/', ' ', $texto);
+
+            
+            // Quitar acentos
+            $texto = iconv('UTF-8', 'ASCII//TRANSLIT', $texto);
+
+            // Convertir a mayúsculas
+            $texto = strtoupper($texto);
+
+            return $texto;
+        }
         
         function insertBrand($req , $res) {
-            if (empty($req->body->marca) || !isset($req->body->marca)) {
-            return $res->json('Faltan datos', 400);
-            }
-            
-            if (empty($req->body->nacionalidad) || !isset($req->body->nacionalidad)) {
-            return $res->json('Faltan datos', 400);
-            }
 
-            if (empty($req->body->anio) || !isset($req->body->anio)) {
-            return $res->json('Faltan datos', 400);
-            }
+            if (empty($req->body->marca))
+                return $res->json('Faltan datos', 400);
 
+            if (empty($req->body->nacionalidad))
+                return $res->json('Faltan datos', 400);
 
-            $marca = $req->body->marca;
+            if (empty($req->body->anio))
+                return $res->json('Faltan datos', 400);
+
+            // ---- Normalizar ----
+            $marca = $this->NormalizarMarca($req->body->marca);
             $nacionalidad = $req->body->nacionalidad;
             $anio = $req->body->anio;
 
-            $id_insertado = $this->model->insert($marca,$nacionalidad,$anio);
+            // ---- Verificar duplicados ----
+            $marcaExistente = $this->model->getByMarca($marca);
 
-            if ($id_insertado == null) {
+            if ($marcaExistente) {
+                return $res->json("La marca '$marca' ya existe.", 409);
+            }
+
+            $id_insertado = $this->model->insert($marca, $nacionalidad, $anio);
+
+            if (!$id_insertado) {
                 return $res->json('Error del servidor', 500);
             }
 
-            
-            // $nuevaMarca = $this->model->getCarBrandById($id_insertado);
-            return $res->json("Recurso creado correctamente  $id_insertado", 201); 
+            return $res->json("Recurso creado correctamente $id_insertado", 201);
         }
 
 
@@ -138,6 +157,7 @@
             return $res->json($Marca_actualizada, 201); 
             
         }
+
     }
 
 ?>

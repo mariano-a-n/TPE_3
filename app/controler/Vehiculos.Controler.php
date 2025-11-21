@@ -157,7 +157,7 @@
             
             //comprobacion de patentes
             if ($this->model->existePatente($patente)) {
-                return $res->json('la patente seleccionada ya esta ciendo usada.', 404 );
+                return $res->json('la patente seleccionada ya esta ciendo usada.', 409 );
             }
             
             
