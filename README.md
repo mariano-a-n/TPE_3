@@ -105,7 +105,178 @@ Tecnologías utilizadas:
 
 ---
 
+
+
 ##  Endpoints
+
+### GET /marcas
+
+Descripción:
+Obtiene la lista completa de todas las marcas registradas en el sistema.
+
+**Ejemplo de uso:**
+
+GET http://localhost/web2/api/marcas
+
+
+Respuesta exitosa (200):
+
+[
+    {
+        "id": 1,
+        "marca": "Ford",
+        "nacionalidad": "Estados Unidos",
+        "anio": 1903
+    },
+    {
+        "id": 2,
+        "marca": "Toyota",
+        "nacionalidad": "Japón",
+        "anio": 1937
+    }
+]
+
+### GET /marcas/:id
+
+Descripción:
+Obtiene la información de una marca específica según su ID.
+
+**Ejemplo de uso:**
+
+GET http://localhost/web2/api/marcas/3
+
+
+Respuesta exitosa (200):
+
+{
+    "id": 3,
+    "marca": "Renault",
+    "nacionalidad": "Francia",
+    "anio": 1899
+}
+
+
+Respuesta de error (404):
+
+"La marca con el id=3 no existe"
+
+### POST /marcas
+
+Descripción:
+Crea una nueva marca en la base de datos.
+Todos los campos son obligatorios.
+
+**Datos requeridos (Body JSON):**
+
+marca (string)
+
+nacionalidad (string)
+
+anio (number)
+
+**Ejemplo de uso:**
+
+POST http://localhost/web2/api/marcas
+
+Body (JSON):
+
+{
+    "marca": "Chevrolet",
+    "nacionalidad": "Estados Unidos",
+    "anio": 1911
+}
+
+Respuesta exitosa (201):
+
+"Recurso creado correctamente 7"
+
+
+Respuesta de error (400):
+
+"Faltan datos"
+
+
+Respuesta error servidor (500):
+
+"Error del servidor"
+
+### DELETE /marcas/:id
+
+Descripción:
+Elimina una marca según su ID, siempre y cuando no tenga vehículos asociados.
+
+Ejemplo de uso:
+
+DELETE http://localhost/web2/api/marcas/4
+
+
+Validaciones del endpoint:
+
+Primero verifica que la marca exista. Si no existe → 404
+
+Luego controla si tiene vehículos asociados.
+Si tiene, NO se puede eliminar → 409 Conflict
+
+Respuesta exitosa (204): (Sin contenido)
+— La marca fue eliminada correctamente.
+
+Respuesta de error (404):
+
+"La marca con el id=4 no existe"
+
+
+Respuesta de error (409):
+
+"no puedes eliminar esta marca porque existen veiculos asociados"
+
+### PUT /marcas/:id
+
+Descripción:
+Actualiza completamente una marca existente.
+Reemplaza todos los datos, aunque no hayan cambiado.
+
+**Datos requeridos (Body JSON):**
+
+marca (string)
+
+nacionalidad (string)
+
+anio (number)
+
+Ejemplo de uso:
+
+PUT http://localhost/web2/api/marcas/3
+
+
+Body (JSON):
+
+{
+    "marca": "Renault",
+    "nacionalidad": "Francia",
+    "anio": 1900
+}
+
+
+Respuesta exitosa (201):
+
+{
+    "id": 3,
+    "marca": "Renault",
+    "nacionalidad": "Francia",
+    "anio": 1900
+}
+
+
+Respuesta de error (404):
+
+"La marca con el id=3 no existe"
+
+
+Respuesta de error (400):
+
+"Faltan datos"
+
+***--------- VEHICULOS --------***
 
 ###  GET /vehiculos
 **Descripción:**  

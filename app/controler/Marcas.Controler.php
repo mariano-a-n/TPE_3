@@ -123,9 +123,6 @@
             return $res->json("Recurso creado correctamente $id_insertado", 201);
         }
 
-
-        
-
         function update($req , $res) {
 
             $id = $req->params->id;
