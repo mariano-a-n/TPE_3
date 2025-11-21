@@ -122,6 +122,12 @@ require_once 'app/models/model.php';
             $query->execute($params);
             return $query->fetchAll(PDO::FETCH_OBJ);
         }
+
+        function existePatente($patente, $id) {
+            $query = $this->db->prepare("SELECT id FROM vehiculos WHERE patente = :patente AND id != :id");
+            $query->execute([':patente' => $patente, ':id' => $id]);
+            return $query->fetch(PDO::FETCH_OBJ);
+        }
         
 
 //////////////////// mariano-dev
