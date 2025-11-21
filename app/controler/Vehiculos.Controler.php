@@ -184,6 +184,16 @@
                     ]);
                 }
             }
+
+            if (isset($data['patente'])) {
+                if ($this->model->existePatente($data['patente'], $id)) {
+                    return $res->json([
+                        "error" => true,
+                        "message" => "La patente está registrada en otro vehículo"
+                    ]);
+                }
+            }
+
             $this->model->patchField($id, $data); // ejecuta la acción de la base de datos
             $modeloActualizado = $this->model->getCarById($id); // actualiza el modelo
 
