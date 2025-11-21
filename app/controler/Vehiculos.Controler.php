@@ -169,17 +169,11 @@
             if (empty($data)) {
                 return $res->json([
                     "error" => true,
-                    "message" => "No se enviaron campos válidos"
-                ]);
+                    "message" => "No están presentes los campos válidos"
+                ], 400);
             }
 
-            $set = [];
-            $params = [];
-            foreach ($data as $field => $value) {
-                $set[] = "$field = ?";
-                $params[] = $value;
-            }
-            $params[] = $id;
+
             /* esto no funciona bien */
             // if ($vendido = 1) {
             //     $this->model->removeCar($id);
@@ -189,13 +183,13 @@
             //         "data" => $this->model->getCarModel()
             //     ]);
             // }
-            $this->model->patchField($set, $params);
-            $modeloActualizado = $this->model->getCarById($id);
+            $this->model->patchField($id, $data); // ejecuta la acción de la base de datos
+            $modeloActualizado = $this->model->getCarById($id); // actualiza el modelo
 
             return $res->json([
                 "error" => false,
                 "message" => "Se ha actualizado el dato correspondiente del vehículo con id=$id",
-                "data" => $modeloActualizado
+                "data" => $modeloActualizado // muestra el modelo ya actualizado
             ], 200);
         }
 
@@ -220,7 +214,7 @@
         }
 
         function filterCar($req, $res) {
-            $tipo = $req->getQueryParams()['tipo'] ?? null;
+            $tipo = $req->params->tipo;
             
             if (!$tipo) {
                 return $res->json([
@@ -230,7 +224,7 @@
             }
 
             $vehiculo = $this->model->getCarByFilter($tipo);
-
+            
             // Si no hay resultados
             if (!$vehiculo || count($vehiculo) === 0) {
                 return $res->json([
@@ -246,16 +240,6 @@
             ]);
         }
         
-        function usedCars() {
-            $modelos = $this->model->getCarModel();
-            
-        }
-
-        function newCars() {
-            $modelos = $this->model->getCarModel();
-            
-        }
-
         // ==== ACCIONES ====
         function sellCar($id) {
             $this->model->updateCar($id);
@@ -336,7 +320,7 @@
 
             //strtoupper hece que todo el txt se vuelva en mayusculas
             $patente = strtoupper(trim($body->patente));
-            $es_nuevo = (int) $body->es_nuevo;
+
             $imagen = trim($body->imagen);
 
             // Campos opcionales es nuevo por default en la tabla siempre es nuevo
