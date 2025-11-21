@@ -23,15 +23,59 @@ require_once 'app/models/model.php';
         }
         
         function insertCar($id_marca, $tipo, $marca, $modelo, $anio, $km, $precio, $patente, $es_nuevo, $imagen) {
-            $query = $this->db->prepare("INSERT INTO vehiculos(id_marca, tipo, marca, modelo, anio, km, precio, patente, es_nuevo, imagen) VALUES (?,?,?,?,?,?,?,?,?,?)");
-            $query->execute([$id_marca, $tipo, $marca, $modelo, $anio, $km, $precio, $patente, $es_nuevo, $imagen]);
+            $sql = "INSERT INTO vehiculos (id_marca, tipo, marca, modelo, anio, km, precio, patente, es_nuevo, imagen) VALUES (:id_marca, :tipo, :marca, :modelo, :anio, :km, :precio, :patente, :es_nuevo, :imagen)";
+
+            $params = [
+                ':id_marca' => $id_marca,
+                ':tipo' => $tipo,
+                ':marca' => $marca,
+                ':modelo' => $modelo,
+                ':anio' => $anio,
+                ':km' => $km,
+                ':precio' => $precio,
+                ':patente' => $patente,
+                ':es_nuevo' => $es_nuevo,
+                ':imagen' => $imagen
+            ];
+
+            $query = $this->db->prepare($sql);
+            $query->execute($params);
 
             return $this->db->lastInsertId();
         }
 
         function updateModelCar($id_marca, $tipo, $marca, $modelo, $anio, $km, $precio, $patente, $es_nuevo, $imagen, $id) {
-            $query = $this->db->prepare("UPDATE vehiculos SET id_marca=?, tipo=?, marca=?, modelo=?, anio=?, km=?, precio=?, patente=?, es_nuevo=?, imagen=? WHERE id=?");
-            $query->execute([$id_marca, $tipo, $marca, $modelo, $anio, $km, $precio, $patente, $es_nuevo, $imagen, $id]);
+            $sql = "UPDATE vehiculos SET
+                id_marca = :id_marca,
+                tipo = :tipo,
+                marca = :marca,
+                modelo = :modelo,
+                anio = :anio,
+                km = :km,
+                precio = :precio,
+                patente = :patente,
+                es_nuevo = :es_nuevo,
+                imagen = :imagen
+                WHERE id = :id";
+
+            $params = [
+                ':id_marca' => $id_marca,
+                ':tipo' => $tipo,
+                ':marca' => $marca,
+                ':modelo' => $modelo,
+                ':anio' => $anio,
+                ':km' => $km,
+                ':precio' => $precio,
+                ':patente' => $patente,
+                ':es_nuevo' => $es_nuevo,
+                ':imagen' => $imagen,
+                ':id' => $id
+            ];
+            // si son muchos campos así es claro, seguro y mantenible
+            // y no es necesario el orden exacto, asocia cada valor por nombre y no por posición
+
+            $query = $this->db->prepare($sql);
+            $query->execute($params);
         }
         
         function updateCar($id) {
@@ -44,8 +88,17 @@ require_once 'app/models/model.php';
             $query->execute([$id]);
         }
 
-        function patchField($set, $params) {
-            $query = $this->db->prepare("UPDATE vehiculos SET " . implode(', ', $set) . " WHERE id = ?");
+        function patchField($id, $data) {
+            $set = [];
+            $params = [];
+            
+            foreach ($data as $field => $value) {
+                $set[] = "$field = ?";
+                $params[] = $value;
+            }
+            $params[] = $id;
+
+            $query = $this->db->prepare("UPDATE vehiculos SET " . implode(', ', $set) . " WHERE id = ?"); // implode(', ', $set) es mas seguro y flexible. Usa los parametros que ya estan defindos
             $query->execute($params);
         }
 
@@ -58,10 +111,10 @@ require_once 'app/models/model.php';
 
         function getCarByFilter($tipo) {
             $sql = "SELECT * FROM vehiculos";
-            $params = [];
+            $params = []; // si fuera con ? habría que pasar el parametro: [$tipo]
 
-            if ($tipo) {
-                $sql .= " WHERE tipo = :tipo";
+            if ($tipo) { // si hay $tipo
+                $sql .= " WHERE tipo = :tipo"; // :tipo es mas claro y flexible que ?
                 $params[':tipo'] = $tipo;
             }
             
