@@ -173,16 +173,17 @@
                 ], 400);
             }
 
-
-            /* esto no funciona bien */
-            // if ($vendido = 1) {
-            //     $this->model->removeCar($id);
-            //     return $res->json([
-            //         "error" => false,
-            //         "message" => "Vehículo de id=$id vendido y eliminado de la base de datos",
-            //         "data" => $this->model->getCarModel()
-            //     ]);
-            // }
+            if (isset($data['vendido'])) {
+                $vendido = (int) $data['vendido'];
+                if ($vendido === 1) {
+                    $this->model->removeCar($id);
+                    return $res->json([
+                        "error" => false,
+                        "message" => "Vehículo de id=$id vendido y eliminado de la base de datos",
+                        "data" => $this->model->getCarModel()
+                    ]);
+                }
+            }
             $this->model->patchField($id, $data); // ejecuta la acción de la base de datos
             $modeloActualizado = $this->model->getCarById($id); // actualiza el modelo
 
