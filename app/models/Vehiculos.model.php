@@ -29,10 +29,6 @@ require_once 'app/models/model.php';
             
         }
         
-        function updateCar($id) {
-            $query = $this->db->prepare('UPDATE vehiculos SET vendido = 1 WHERE id = ?');
-            $query->execute([$id]);
-        }
         
         function updateModelCar($id_marca, $modelo, $anio, $km, $precio, $patente, $es_nuevo, $imagen, $id) {
             $query = $this->db->prepare("UPDATE vehiculos SET id_marca=?, modelo=?, anio=?, km=?, precio=?, patente=?, es_nuevo=?, imagen=? WHERE id=?");
@@ -122,5 +118,19 @@ require_once 'app/models/model.php';
             $query->execute([$patente]);
             $resultado = $query->fetch(PDO::FETCH_OBJ);
             return $resultado->total > 0;
+        }
+
+        function patchField($id, $data) {
+            $set = [];
+            $params = [];
+
+            foreach ($data as $field => $value) {
+                $set[] = "$field = ?";
+                $params[] = $value;
+            }
+            $params[] = $id;
+
+            $query = $this->db->prepare("UPDATE vehiculos SET " . implode(', ', $set) . " WHERE id = ?"); // implode(', ', $set) es mas seguro y flexible. Usa los parametros que ya estan defindos
+            $query->execute($params);
         }
 }

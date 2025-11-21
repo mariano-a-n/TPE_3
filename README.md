@@ -446,8 +446,9 @@ Body (JSON) (campos actualizados):
 
 (todo esto es solo un ejemplo).
 
-<!-- 
-### paso a paso del PATCH?
+### PATCH /vehiculos/:id
+
+## paso a paso del PATCH?
 
 obtiene el ID del vehículo desde los parámetros de la URL ($req->params->id)
 
@@ -463,7 +464,7 @@ ejecuta la actualización usando el método patchField del modelo mediante $this
 
 vuelve a consultar el vehículo actualizado y lo devuelve en la respuesta en formato JSON junto con un mensaje de éxito, código HTTP 200 de éxito, y muestra el array "data" con la nueva infomación del vehículo
 
-http://localhost/web2/TPE_3/api/vehiculos/:id es el endpoint con el id del vehículo a modificar para ingresar y hacer cambio de 1 dato o mas de 1 desde el 'body raw' mediante formato JSON  -->
+http://localhost/web2/TPE_3/api/vehiculos/:id es el endpoint con el id del vehículo a modificar para ingresar y hacer cambio de 1 dato o mas de 1 desde el 'body raw' mediante formato JSON 
 
 
 ### DELETE /vehiculos/:id

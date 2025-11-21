@@ -127,11 +127,6 @@
             ], 200);
         }
 
-        function sellCar($id) {
-            $this->model->updateCar($id);
-            // header("Location: " . BASE_URL . "modelos");
-        }
-
         //////eliminar
         function deletCar($req, $res) {
             $id = $req->params->id;
@@ -362,5 +357,61 @@
                 'es_nuevo' => $es_nuevo
             ];
         }
+    
+        //marcelo
+
+        function patchCar($req, $res) {
+
+            $id = $req->params->id;
+            $modelo = $this->model->getCarById($id);
+
+            $input = json_decode(file_get_contents('php://input'), true);
+
+            // file_get_contents('php://input') lee el contenido bruto del HTTP
+            // json_decode convierte el contenido JSON en un array asociativo
+            
+            if (empty($modelo)) {
+                return $res->json([
+                    "error" => true,
+                    "message" => "Vehículo con id=$id no encontrado"
+                ], 404); // no se ha encontrado
+            }
+            
+            $allowedFields = ['tipo', 'marca', 'modelo', 'anio', 'km', 'precio', 'patente', 'es_nuevo', 'imagen', 'vendido']; // campos permitidos
+            $data = [];
+
+            foreach ($input as $field => $value) {
+                if (in_array($field, $allowedFields)) {
+                    $data[$field] = $value;
+                }
+            }
+
+            if (empty($data)) {
+                return $res->json([
+                    "error" => true,
+                    "message" => "No están presentes los campos válidos"
+                ], 400);
+            }
+
+            if (isset($data['vendido'])) {
+                $vendido = (int) $data['vendido'];
+                if ($vendido === 1) {
+                    $this->model->deleteCar($id);
+                    return $res->json([
+                        "error" => false,
+                        "message" => "Vehículo de id=$id vendido y eliminado de la base de datos",
+                    ]);
+                }
+            }
+            $this->model->patchField($id, $data); // ejecuta la acción de la base de datos
+            $modeloActualizado = $this->model->getCarById($id); // actualiza el modelo
+
+            return $res->json([
+                "error" => false,
+                "message" => "Se ha actualizado el dato correspondiente del vehículo con id=$id",
+                "data" => $modeloActualizado // muestra el modelo ya actualizado
+            ], 200);
+        }
+
     } 
 ?>
